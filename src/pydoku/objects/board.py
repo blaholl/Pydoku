@@ -159,6 +159,9 @@ class Board:
 
     def check_naked_single(self) -> int:
         solved: list[Cell] = [list(NakedSingle.check(row)) for row in self.rows.open]
+        if not solved:
+            return NoOp()
+
         count: int = self.evaluate_result(
             Solved(cells=sorted(mi.flatten(solved), key=lambda x: x.idx))
         )
@@ -170,9 +173,27 @@ class Board:
             list(HiddenSingle.check(container))
             for container in self._gather_open_containers()
         ]
+        if not solved:
+            return NoOp()
 
         count: int = self.evaluate_result(
             Solved(cells=sorted(mi.flatten(solved), key=lambda x: x.idx))
         )
 
         return count
+
+    def check_naked_double(self) -> int:
+        solved: list[tuple[Cell]] = [
+            list(NakedDouble.check(container))
+            for container in self.rows.open + self.columns.open + self.houses.open
+        ]
+        counts = sum(mi.flatten(solved))
+        if not counts or counts == 0:
+            return NoOp()
+
+        # deduped: list[tuple[Cell]] = [item for item in solved if item]
+        # count: int = self.evaluate_result(
+        #     Excluded(cells=sorted(mi.flatten(solved), key=lambda x: x.idx))
+        # )
+
+        return counts

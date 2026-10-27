@@ -100,7 +100,7 @@ class Cell:
         return i in self.can
 
     def __len__(self) -> int:
-        return len(self._can)
+        return len(self.can)
 
     @singledispatchmethod
     def pop(self, can: int) -> None:
