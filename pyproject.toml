@@ -43,6 +43,4 @@ docs = [
 lint = [
     "ruff>=0.17.2",
 ]
-logging = [
-    "loguru>=0.7.3",
-]
+logging = []

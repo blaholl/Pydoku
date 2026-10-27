@@ -184,3 +184,4 @@ def test_verify_board(get_board_from_file: Board) -> None:
     board.populate()
 
     assert board.verify() is False
+    board.show()

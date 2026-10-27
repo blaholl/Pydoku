@@ -20,19 +20,9 @@ def display_board(board: Board) -> None:
         output.add_column(str(i), justify="center")
 
     for row in board.rows:
-        output.add_row(
-            str(row[1]),
-            str(row[2]),
-            str(row[3]),
-            str(row[4]),
-            str(row[5]),
-            str(row[6]),
-            str(row[7]),
-            str(row[8]),
-            str(row[9]),
-        )
+        output.add_row(*[str(cell) for cell in row.cells])
 
-    console.print(output)
+    console.print(output, new_line_start=True)
 
 
 def display_verify(board: Board) -> None:

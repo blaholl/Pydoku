@@ -145,8 +145,11 @@ class Board:
     def verify(self) -> bool:
         return all(con.is_solved() for con in self.containers)
 
-    def show(self, verify: bool = False) -> None:
+    def show(self, verify: bool = False, *, print_verify: bool = False) -> None:
         if verify:
+            print(self.verify())
+
+        if print_verify:
             display_verify(self)
 
         display_board(self)
