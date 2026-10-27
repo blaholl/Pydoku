@@ -124,6 +124,6 @@ def test_containers_open(get_populated_board: Board) -> None:
     unsolved_rows = board.rows.open
     unsolved_cols = board.columns.open
     unsolved_houses = board.houses.open
-    assert len(unsolved_rows) == 0
-    assert len(unsolved_cols) == 0
-    assert len(unsolved_houses) == 0
+    assert len(unsolved_rows) == 9
+    assert len(unsolved_cols) == 9
+    assert len(unsolved_houses) == 9

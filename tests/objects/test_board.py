@@ -178,12 +178,9 @@ def test_gather_open_containers(get_board_from_file: Board) -> None:
     assert all(con.solved is False for con in containers) is True
 
 
-def test_print_verify(get_board_from_file: Board) -> None:
+def test_verify_board(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     board.populate()
 
-    board.check_naked_single()
-    board.check_hidden_single()
-
-    board.verify()
+    assert board.verify() is False

@@ -5,16 +5,17 @@ from pathlib import Path
 from types import NoneType
 
 import more_itertools as mi
-from rich.table import Table
 
 from ..techniques import *
 from ..utils.construct_board import construct_cells, load_puzzle, set_board
-from ..utils.display import display_board
+from ..utils.display import display_board, display_verify
 from ..utils.result import Excluded, NoOp, Solved
 from .cell import Cell
 from .containers import Column, Columns, Container, House, Houses, Row, Rows, Sightline
 
 type Puzzle = list[int]
+
+type Containers = Rows | Columns | Houses
 
 
 class Board:
@@ -57,6 +58,10 @@ class Board:
         )
 
         assert len(self.houses) == 9
+
+        self.containers: list[Container] = list(
+            mi.flatten([self.rows, self.columns, self.houses])
+        )
 
         self.files: list[Rows] = None
         self.ranks: list[Columns] = None
@@ -137,20 +142,13 @@ class Board:
     def _(self, result: Excluded) -> None:
         _ = result
 
-    def verify(self) -> None:
-        print("Rows:")
-        for row in self.rows:
-            print(f"Row {row.idx} -> {row.is_solved()}")
+    def verify(self) -> bool:
+        return all(con.is_solved() for con in self.containers)
 
-        print("Columns:")
-        for col in self.columns:
-            print(f"Column {col.idx} -> {col.is_solved()}")
+    def show(self, verify: bool = False) -> None:
+        if verify:
+            display_verify(self)
 
-        print("Houses:")
-        for house in self.houses:
-            print(f"House {house.idx} -> {house.is_solved()}")
-
-    def show(self) -> Table:
         display_board(self)
 
     def _gather_open_containers(self) -> Iterable[Container]:

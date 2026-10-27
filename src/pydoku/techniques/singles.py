@@ -17,11 +17,10 @@ class NakedSingle(Technique):
     @staticmethod
     def check(container: Container) -> Generator[Cell]:
         for cell in container.open:
-            if len(cell) == 1:
-                cell.solve(mi.only(cell.can))
-                yield cell
-            else:
-                pass
+            if len(cell) != 1:
+                continue
+            cell.solve(mi.only(cell.can))
+            yield cell
 
 
 class HiddenSingle(Technique):

@@ -9,11 +9,11 @@ if TYPE_CHECKING:
 console = Console()
 
 
-def display_board(board: Board) -> Table:
-    """Builds textual display for the board
+def display_board(board: Board) -> None:
+    """Builds textual display for the board and prints.
 
-    Returns
-        Table: :class:`rich.Table` representation of the :class:`Board`.
+    Args:
+        board (Board): The current :class:`Board` object.
     """
     output: Table = Table(show_lines=True, show_header=False)
     for i in range(1, 10):
@@ -33,3 +33,22 @@ def display_board(board: Board) -> Table:
         )
 
     console.print(output)
+
+
+def display_verify(board: Board) -> None:
+    """Prints the solved status of each :class:`Container` object.
+
+    Args:
+        board (Board): The current :class:`Board` object.
+    """
+    print("Rows:")
+    for row in board.rows:
+        print(f"Row {row.idx} -> {row.is_solved()}")
+
+    print("Columns:")
+    for col in board.columns:
+        print(f"Column {col.idx} -> {col.is_solved()}")
+
+    print("Houses:")
+    for house in board.houses:
+        print(f"House {house.idx} -> {house.is_solved()}")
