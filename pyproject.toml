@@ -1,0 +1,48 @@
+[project]
+name = "pydoku"
+dynamic = ['version']
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "TrailM1x", email = "narcissismsmiles@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "rich>=15.0.0",
+]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pydoku"]
+
+[tool.uv-dynamic-versioning]
+style = "pep440"        # also "semver" or "pvp"
+pattern = "default"
+
+[project.scripts]
+pydoku = "pydoku.__main__:main"
+
+[dependency-groups]
+common = [
+    "more-itertools>=11.2.1",
+]
+dev = [
+    "hypothesis>=6.170.9",
+    "pytest>=9.1.1",
+    "uv-dynamic-versioning>=0.14.1",
+]
+docs = [
+    "sphinx>=9.2.0",
+]
+lint = [
+    "ruff>=0.17.2",
+]
+logging = [
+    "loguru>=0.7.3",
+]

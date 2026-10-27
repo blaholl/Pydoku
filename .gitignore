@@ -1,0 +1,7 @@
+__pycache__/
+.venv/
+.pytest_cache
+Pydoku.code-workspace
+.DS_Store
+.vscode/
+dist/
