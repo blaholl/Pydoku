@@ -169,7 +169,7 @@ def test_gather_open_containers(get_board_from_file: Board) -> None:
 
     board.populate()
 
-    containers = list(board._gather_open_containers())
+    containers = list(board.open)
     row_count: int = len(board.rows.open)
     col_count: int = len(board.columns.open)
     house_count: int = len(board.houses.open)
