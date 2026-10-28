@@ -8,6 +8,13 @@ authors = [
 ]
 requires-python = ">=3.14"
 dependencies = [
+    "more-itertools>=11.2.1",
+    "rich>=15.0.0",
+    "hypothesis>=6.170.9",
+    "pytest>=9.1.1",
+    "uv-dynamic-versioning>=0.14.1",
+    "sphinx>=9.2.0",
+    "ruff>=0.17.2",
 ]
 
 [build-system]
@@ -43,4 +50,3 @@ docs = [
 lint = [
     "ruff>=0.17.2",
 ]
-logging = []
