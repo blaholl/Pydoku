@@ -135,8 +135,8 @@ class Board:
             cell.can = set(range(1, 10)) - known
 
     @singledispatchmethod
-    def evaluate_result(self, result: NoOp) -> None:
-        _ = result
+    def evaluate_result(self, _: NoOp) -> None:
+        pass
 
     @evaluate_result.register(Solved)
     def _(self, result: Solved) -> None:
@@ -147,7 +147,8 @@ class Board:
 
     @evaluate_result.register(Excluded)
     def _(self, result: Excluded) -> None:
-        _ = result
+        for cell, num in mi.gray_product(result.cells, result.to_exclude):
+            cell.pop(num)
 
     def verify(self) -> bool:
         return all(con.is_solved() for con in self.containers)
@@ -164,32 +165,29 @@ class Board:
     def _gatheropen(self) -> Iterable[Container]:
         return mi.flatten([self.rows.open, self.columns.open, self.houses.open])
 
-    def check_naked_single(self) -> int:
-        count = 0
+    def check_naked_single(self) -> bool:
+        result = False
         for row in self.rows.open:
             for ns in NakedSingle(row):
-                self.evaluate_result(Solved(ns))
-                count += 1
+                self.evaluate_result(ns)
+                result = True
 
-        return count
+        return result
 
     def check_hidden_single(self) -> int:
-        count = 0
+        result = False
         for container in self.open:
             for hs in HiddenSingle(container):
-                if hs is None:
-                    continue
-                self.evaluate_result(Solved(hs))
-                count += 1
+                self.evaluate_result(hs)
+                result = True
 
-        return count
+        return result
 
     def check_naked_double(self) -> int:
-        count = 0
+        result = False
         for container in self.open:
             for nd in NakedDouble(container):
-                if not nd:
-                    continue
-                count += 1
+                self.evaluate_result(nd)
+                result = True
 
-        return count
+        return result

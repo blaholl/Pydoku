@@ -1,4 +1,8 @@
-from typing import Protocol
+from collections.abc import Callable, Generator
+from typing import TYPE_CHECKING, Protocol
+
+if TYPE_CHECKING:
+    from ..utils.result import Result
 
 
 class Technique(Protocol):
@@ -12,6 +16,7 @@ class Technique(Protocol):
 
     def __init__(self): ...
 
-    def __call__(self): ...
+    def __call__(self) -> Generator[Result]: ...
 
-    def __iter__(self): ...
+    def __iter__(self) -> Generator[Callable[..., Result]]:
+        yield from self.__call__()

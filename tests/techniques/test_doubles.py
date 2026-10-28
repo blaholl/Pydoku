@@ -21,8 +21,8 @@ def test_naked_double(get_board_from_file: Board) -> None:
 
     assert 7 in board.index.get(20)
 
-    count: int = board.check_naked_double()
-    assert count >= 1
+    result: bool = board.check_naked_double()
+    assert result is True
     assert 4 not in board.index.get(20)
     assert 7 not in board.index.get(20)
     assert 4 not in board.index.get(25)

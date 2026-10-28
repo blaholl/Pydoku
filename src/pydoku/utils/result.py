@@ -14,8 +14,13 @@ class Solved(Result):
 
 
 class Excluded(Result):
-    def __init__(self, cells: Iterable[Cell]) -> None:
-        self.cells = cells
+    def __init__(
+        self,
+        cells: Iterable[Cell],
+        to_exclude: Iterable[int],
+    ) -> None:
+        self.cells: Iterable[Cell] = cells
+        self.to_exclude: Iterable[int] = to_exclude
 
 
 class NoOp(Result):
