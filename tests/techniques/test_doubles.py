@@ -19,8 +19,6 @@ def get_board_from_file() -> Board:
 def test_naked_double(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
-    row = board.rows[3].open
-    print(row)
     assert 7 in board.index.get(20)
 
     count: int = board.check_naked_double()

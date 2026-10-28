@@ -20,7 +20,6 @@ def test_naked_single(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     init_count = len([cell for cell in board.cells if cell.solved])
-
     count: int = board.check_naked_single()
     assert isinstance(count, int)
     assert count >= 1

@@ -5,3 +5,4 @@ Pydoku.code-workspace
 .DS_Store
 .vscode/
 dist/
+.ruff_cache

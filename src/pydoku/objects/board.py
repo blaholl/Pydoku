@@ -59,12 +59,24 @@ class Board:
 
         assert len(self.houses) == 9
 
+        self.files: list[Rows] = None
+        self.ranks: list[Columns] = None
+
         self.containers: list[Container] = list(
             mi.flatten([self.rows, self.columns, self.houses])
         )
 
-        self.files: list[Rows] = None
-        self.ranks: list[Columns] = None
+        self._open: list[Container] = (
+            self.rows.open + self.columns.open + self.houses.open
+        )
+
+    @property
+    def open(self) -> list[Containers]:
+        return self.rows.open + self.columns.open + self.houses.open
+
+    @open.setter
+    def open(self) -> list[Containers]:
+        self._open = self.rows.open + self.columns.open + self.houses.open
 
     def set_puzzle(self, puzzle_path: str, level: str, num: int) -> None:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
@@ -127,16 +139,11 @@ class Board:
         _ = result
 
     @evaluate_result.register(Solved)
-    def _(self, result: Solved) -> int:
-        count = 0
-        for cell in result.cells:
-            sl: Sightline = self.get_cell_sightline(cell, open=True)
-            c: Cell
-            for c in mi.flatten((sl.row, sl.col, sl.house)):
-                c.pop(cell.solution)
-                count += 1
-
-        return count
+    def _(self, result: Solved) -> None:
+        c: Cell
+        sl: Sightline = self.get_cell_sightline(result.cell, open=True)
+        for c in mi.flatten((sl.row, sl.col, sl.house)):
+            c.pop(result.cell.solution)
 
     @evaluate_result.register(Excluded)
     def _(self, result: Excluded) -> None:
@@ -154,46 +161,35 @@ class Board:
 
         display_board(self)
 
-    def _gather_open_containers(self) -> Iterable[Container]:
+    def _gatheropen(self) -> Iterable[Container]:
         return mi.flatten([self.rows.open, self.columns.open, self.houses.open])
 
     def check_naked_single(self) -> int:
-        solved: list[Cell] = [list(NakedSingle.check(row)) for row in self.rows.open]
-        if not solved:
-            return NoOp()
-
-        count: int = self.evaluate_result(
-            Solved(cells=sorted(mi.flatten(solved), key=lambda x: x.idx))
-        )
+        count = 0
+        for row in self.rows.open:
+            for ns in NakedSingle(row):
+                self.evaluate_result(Solved(ns))
+                count += 1
 
         return count
 
     def check_hidden_single(self) -> int:
-        solved: list[Cell] = [
-            list(HiddenSingle.check(container))
-            for container in self._gather_open_containers()
-        ]
-        if not solved:
-            return NoOp()
-
-        count: int = self.evaluate_result(
-            Solved(cells=sorted(mi.flatten(solved), key=lambda x: x.idx))
-        )
+        count = 0
+        for container in self.open:
+            for hs in HiddenSingle(container):
+                if hs is None:
+                    continue
+                self.evaluate_result(Solved(hs))
+                count += 1
 
         return count
 
     def check_naked_double(self) -> int:
-        solved: list[tuple[Cell]] = [
-            list(NakedDouble.check(container))
-            for container in self.rows.open + self.columns.open + self.houses.open
-        ]
-        counts = sum(mi.flatten(solved))
-        if not counts or counts == 0:
-            return NoOp()
+        count = 0
+        for container in self.open:
+            for nd in NakedDouble(container):
+                if not nd:
+                    continue
+                count += 1
 
-        # deduped: list[tuple[Cell]] = [item for item in solved if item]
-        # count: int = self.evaluate_result(
-        #     Excluded(cells=sorted(mi.flatten(solved), key=lambda x: x.idx))
-        # )
-
-        return counts
+        return count

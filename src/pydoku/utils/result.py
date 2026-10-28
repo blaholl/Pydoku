@@ -9,8 +9,8 @@ class Result(Protocol): ...
 
 
 class Solved(Result):
-    def __init__(self, cells: Iterable[Cell]) -> None:
-        self.cells = cells
+    def __init__(self, cell: Cell) -> None:
+        self.cell = cell
 
 
 class Excluded(Result):
