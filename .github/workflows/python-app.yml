@@ -3,11 +3,7 @@
 
 name: Python application
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push]
 
 permissions:
   contents: read
@@ -30,7 +26,7 @@ jobs:
         uv sync
     - name: Lint with ruff
       run: |
-        uv run ruff --0check
+        uv run ruff check
     - name: Test with pytest
       run: |
         uv run pytest
