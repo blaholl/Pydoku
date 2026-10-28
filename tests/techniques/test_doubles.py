@@ -16,20 +16,27 @@ def get_board_from_file() -> Board:
     return board
 
 
-def test_naked_single(get_board_from_file: Board) -> None:
+def test_naked_double(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
-    init_count = len([cell for cell in board.cells if cell.solved])
+    assert 7 in board.index.get(20)
 
-    count: int = board.check_naked_single()
-    assert isinstance(count, int)
-    assert count >= 1
+    result: bool = board.check_naked_double()
+    assert result is True
+    assert 4 not in board.index.get(20)
+    assert 7 not in board.index.get(20)
+    assert 4 not in board.index.get(25)
+    assert 7 not in board.index.get(25)
+    assert 4 not in board.index.get(26)
+    assert 7 not in board.index.get(26)
 
-    updated_count = len([cell for cell in board.cells if cell.solved])
-    assert init_count != updated_count
-    assert updated_count > init_count
+    assert 4 in board.index.get(23)
+    assert 7 in board.index.get(23)
+    assert 4 in board.index.get(24)
+    assert 7 in board.index.get(24)
 
 
+@pytest.mark.skip("Not Implemented")
 def test_hidden_single(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 

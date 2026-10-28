@@ -6,32 +6,36 @@ from typing import TYPE_CHECKING
 import more_itertools as mi
 
 from ..utils.policies import Policy
+from ..utils.result import NoOp, Result, Solved
 from .technique import Technique
 
 if TYPE_CHECKING:
-    from ..objects import Cell
     from ..objects.containers import Container
 
 
 class NakedSingle(Technique):
-    @staticmethod
-    def check(container: Container) -> Generator[Cell]:
-        for cell in container.open:
+    def __init__(self, container: Container) -> None:
+        self.container = container
+
+    def __call__(self) -> Generator[Result]:
+        for cell in self.container:
             if len(cell) != 1:
                 continue
             cell.solve(mi.only(cell.can))
-            yield cell
+            yield Solved(cell)
 
 
 class HiddenSingle(Technique):
-    @staticmethod
-    def check(container: Container) -> Generator[Cell]:
-        counts: Counter = container.get_counts()
+    def __init__(self, container: Container) -> None:
+        self.container = container
+
+    def __call__(self) -> Generator[Result]:
+        counts: Counter = self.container.get_counts()
         if 1 not in counts.values():
-            pass
-        for (k, v), cell in it.product(counts.items(), container.open):
-            if Policy.is_not_hidden_single(k, v, cell, container.known):
+            return NoOp()
+        for (k, v), cell in it.product(counts.items(), self.container.open):
+            if Policy.is_not_hidden_single(k, v, cell, self.container.known):
                 continue
 
             cell.solve(k)
-            yield cell
+            yield Solved(cell)

@@ -1,6 +1,9 @@
 # Pydoku Sudoku Solver
 
-!Note: The docs are not up-to-date for this project.
+[![CodeQL Advanced](https://github.com/blaholl/Pydoku/actions/workflows/codeql.yml/badge.svg)](https://github.com/blaholl/Pydoku/actions/workflows/codeql.yml)  [![Python application](https://github.com/blaholl/Pydoku/actions/workflows/python-app.yml/badge.svg)](https://github.com/blaholl/Pydoku/actions/workflows/python-app.yml)
+
+> [!Note]
+> The docs are not up-to-date for this project.
 
 A complex, automated Sudoku puzzle solver that uses programmatic implementations of known Sudoku techniques rather than brute force.
 

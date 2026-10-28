@@ -12,6 +12,7 @@ dependencies = [
     "rich>=15.0.0",
     "hypothesis>=6.170.9",
     "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
     "uv-dynamic-versioning>=0.14.1",
     "sphinx>=9.2.0",
     "ruff>=0.17.2",
@@ -42,6 +43,7 @@ common = [
 dev = [
     "hypothesis>=6.170.9",
     "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
     "uv-dynamic-versioning>=0.14.1",
 ]
 docs = [
@@ -49,4 +51,10 @@ docs = [
 ]
 lint = [
     "ruff>=0.17.2",
+]
+
+test = [
+    { include-group = "dev" },
+    { include-group = "docs" },
+    { include-group = "lint" },
 ]

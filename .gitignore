@@ -5,3 +5,8 @@ Pydoku.code-workspace
 .DS_Store
 .vscode/
 dist/
+.ruff_cache
+.coverage
+coverage.xml
+py-coverage
+pytest.ini
