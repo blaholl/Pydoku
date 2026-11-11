@@ -16,6 +16,17 @@ def get_board_from_file() -> Board:
     return board
 
 
+@pytest.fixture
+def get_board_hd_from_file() -> Board:
+    file_path: Path = Path("./tests/data/test-puzzles.json")
+    level = "hidden_pair"
+    puz = 1
+
+    board: Board = Board.from_puzzle(puzzle_path=file_path, level=level, num=puz)
+    board.populate()
+    return board
+
+
 def test_naked_double(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
@@ -36,17 +47,42 @@ def test_naked_double(get_board_from_file: Board) -> None:
     assert 7 in board.index.get(24)
 
 
-@pytest.mark.skip("Not Implemented")
-def test_hidden_single(get_board_from_file: Board) -> None:
-    board: Board = get_board_from_file
+def test_hidden_double(get_board_hd_from_file: Board) -> None:
+    board: Board = get_board_hd_from_file
 
-    init_count = len([cell for cell in board.cells if cell.solved])
-    board.check_naked_single()
-    count: int = board.check_hidden_single()
+    assert 1 in board.index.get(49)
+    assert 3 in board.index.get(49)
+    assert 1 in board.index.get(51)
+    assert 3 in board.index.get(51)
+    assert 4 in board.index.get(51)
 
-    assert isinstance(count, int)
-    assert count >= 1
+    result: bool = board.check_hidden_double()
+    assert result is True
+    board.check_naked_double()
 
-    updated_count = len([cell for cell in board.cells if cell.solved])
-    assert init_count != updated_count
-    assert updated_count > init_count
+    assert 5 in board.index.get(49)
+    assert 5 in board.index.get(51)
+    assert 8 in board.index.get(49)
+    assert 8 in board.index.get(51)
+
+    assert 1 not in board.index.get(49)
+    assert 3 not in board.index.get(49)
+    assert 1 not in board.index.get(51)
+    assert 3 not in board.index.get(51)
+    assert 4 not in board.index.get(51)
+
+    assert 5 not in board.index.get(46)
+    assert 5 not in board.index.get(47)
+    assert 5 not in board.index.get(48)
+    assert 5 not in board.index.get(50)
+    assert 5 not in board.index.get(52)
+    assert 5 not in board.index.get(53)
+    assert 5 not in board.index.get(54)
+
+    assert 8 not in board.index.get(46)
+    assert 8 not in board.index.get(47)
+    assert 8 not in board.index.get(48)
+    assert 8 not in board.index.get(50)
+    assert 8 not in board.index.get(52)
+    assert 8 not in board.index.get(53)
+    assert 8 not in board.index.get(54)

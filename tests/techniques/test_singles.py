@@ -4,6 +4,8 @@ import pytest
 
 from pydoku.objects import Board
 
+# from pydoku.techniques import NakedSingle
+
 
 @pytest.fixture
 def get_board_from_file() -> Board:
@@ -43,3 +45,12 @@ def test_hidden_single(get_board_from_file: Board) -> None:
     updated_count = len([cell for cell in board.cells if cell.solved])
     assert init_count != updated_count
     assert updated_count > init_count
+
+
+# def test_check_technique(get_board_from_file: Board) -> None:
+#     board: Board = get_board_from_file
+
+#     init_count = len([cell for cell in board.cells if cell.solved])
+#     result: bool = board.get_res(NakedSingle)
+
+#     board.show(verify=True)

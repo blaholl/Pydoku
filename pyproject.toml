@@ -16,6 +16,7 @@ dependencies = [
     "uv-dynamic-versioning>=0.14.1",
     "sphinx>=9.2.0",
     "ruff>=0.17.2",
+    "click>=8.5.0",
 ]
 
 [build-system]
@@ -33,10 +34,11 @@ style = "pep440"        # also "semver" or "pvp"
 pattern = "default"
 
 [project.scripts]
-pydoku = "pydoku.__main__:main"
+pydoku = "pydoku.__main__:cli"
 
 [dependency-groups]
 common = [
+    "click>=8.5.0",
     "more-itertools>=11.2.1",
     "rich>=15.0.0",
 ]

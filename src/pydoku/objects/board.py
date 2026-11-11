@@ -3,6 +3,7 @@ from collections.abc import Iterable
 from functools import singledispatchmethod
 from pathlib import Path
 from types import NoneType
+from typing import Self
 
 import more_itertools as mi
 
@@ -83,7 +84,7 @@ class Board:
         set_board(self.index.values(), puzzle)
 
     @classmethod
-    def from_puzzle(cls, puzzle_path: str, level: str, num: int) -> None:
+    def from_puzzle(cls, puzzle_path: str, level: str, num: int) -> Self:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
         board = cls()
         set_board(board.index.values(), puzzle)
@@ -147,7 +148,7 @@ class Board:
 
     @evaluate_result.register(Excluded)
     def _(self, result: Excluded) -> None:
-        for cell, num in mi.gray_product(result.cells, result.to_exclude):
+        for cell, num in it.product(result.cells, result.to_exclude):
             cell.pop(num)
 
     def verify(self) -> bool:
@@ -174,7 +175,7 @@ class Board:
 
         return result
 
-    def check_hidden_single(self) -> int:
+    def check_hidden_single(self) -> bool:
         result = False
         for container in self.open:
             for hs in HiddenSingle(container):
@@ -183,11 +184,26 @@ class Board:
 
         return result
 
-    def check_naked_double(self) -> int:
+    def check_naked_double(self) -> bool:
         result = False
+        if len(self.open) <= 2:
+            return result
+
         for container in self.open:
             for nd in NakedDouble(container):
                 self.evaluate_result(nd)
+                result = True
+
+        return result
+
+    def check_hidden_double(self) -> bool:
+        result = False
+        if len(self.open) <= 2:
+            return result
+
+        for container in self.open:
+            for hd in HiddenDouble(container):
+                self.evaluate_result(hd)
                 result = True
 
         return result

@@ -10,3 +10,5 @@ dist/
 coverage.xml
 py-coverage
 pytest.ini
+
+*cache.py

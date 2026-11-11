@@ -15,6 +15,7 @@ if TYPE_CHECKING:
 
 class NakedSingle(Technique):
     def __init__(self, container: Container) -> None:
+        super().__init__(container)
         self.container = container
 
     def __call__(self) -> Generator[Result]:
@@ -27,9 +28,10 @@ class NakedSingle(Technique):
 
 class HiddenSingle(Technique):
     def __init__(self, container: Container) -> None:
+        super().__init__(container)
         self.container = container
 
-    def __call__(self) -> Generator[Result]:
+    def __call__(self) -> Generator[Result, None, NoOp]:
         counts: Counter = self.container.get_counts()
         if 1 not in counts.values():
             return NoOp()

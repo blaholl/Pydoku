@@ -45,7 +45,7 @@ class Cell:
         return []
 
     @exc.setter
-    def exc(self, other: int | set[int]) -> set[int]:
+    def exc(self, other: int | set[int]) -> None:
         if not self.solved:
             if isinstance(other, int):
                 self._exc = self._exc.add(other)
@@ -53,13 +53,13 @@ class Cell:
                 self._exc |= other
 
     @property
-    def can(self) -> list[int] | int:
+    def can(self) -> list[int]:
         if not self.solved:
             return sorted(self._can)
         return []
 
     @can.setter
-    def can(self, other: int | set[int]) -> set[int]:
+    def can(self, other: int | set[int]) -> None:
         if not self.solved:
             if isinstance(other, int):
                 self._can = self._can.add(other)
@@ -77,21 +77,21 @@ class Cell:
     def __repr__(self) -> str:
         base: str = f"{self.__class__.__name__}(idx={self.idx}, row={self.pos.r}, column={self.pos.c}, house={self.pos.h}, can={self.can}, exc={self.exc}"
         if self.initial:
-            return (
-                base
-                + f", solved={self.solved}, solution={self.solution}, initial={self.initial})"
-            )
+            return f"{base}, solved={self.solved}, solution={self.solution}, initial={self.initial})"
         elif self.solved:
-            return base + f", solved={self.solved}, solution={self.solution})"
+            return f"{base}, solved={self.solved}, solution={self.solution})"
         elif self.bival:
-            return base + f", bival={self.bival})"
+            return f"{base}, bival={self.bival})"
         else:
-            return base + ")"
+            return f"{base})"
 
     def __str__(self) -> str:
         if self.solved:
             return str(self.solution)
         return f"[{','.join(str(c) for c in self.can)}] / [{','.join(str(e) for e in self.exc)}]"
+
+    def __hash__(self) -> int:
+        return hash((self.idx, self.solved, self.solution))
 
     def __eq__(self, other: Cell) -> bool:
         return self.can == other.can

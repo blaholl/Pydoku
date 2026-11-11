@@ -1,9 +1,4 @@
-import pydoku
-
-
-def main():
-    print(pydoku.__version__)
-
+from .utils.cli import cli
 
 if __name__ == "__main__":
-    main()
+    cli()
