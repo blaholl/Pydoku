@@ -1,5 +1,5 @@
 import itertools as it
-from collections import Counter, UserList
+from collections import Counter, UserList, defaultdict
 from collections.abc import Iterable, Iterator
 from dataclasses import dataclass
 from typing import Generic
@@ -22,7 +22,7 @@ class Sightline:
 
 class Container[T](UserList):
     def __init__(self, idx: int, cells: Iterable[Cell]) -> None:
-        self.idx = idx
+        self.idx: int = idx
         assert len(cells) == 9
         self.data: list[Cell] = cells
         self._cells: list[Cell] = self.data
@@ -34,6 +34,8 @@ class Container[T](UserList):
         self._unknown: list[int] = []
 
         self._solved: bool = False
+
+        self.cache: dict[dict[str, list[Cell]]] = defaultdict(None, defaultdict(list))
 
     @property
     def solved(self) -> bool:
@@ -83,6 +85,12 @@ class Container[T](UserList):
     @unknown.setter
     def unknown(self) -> list[int]:
         self._unknown = sorted(set(range(1, 10)) - set(self.known))
+
+    def __hash__(self) -> int:
+        return hash((self.idx, *self.cells))
+
+    def __eq__(self, other: Container) -> bool:
+        return all([self.idx == other.idx, self.cells == other.cells])
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({', '.join(repr(c) for c in self.data)})"

@@ -10,3 +10,5 @@ from .result import (
     Excluded as Excluded,
     NoOp as NoOp,
 )
+
+from .cli import cli as cli

@@ -26,10 +26,10 @@ def test_hidden_single_policy(get_board_from_file: Board) -> None:
 
     products = list(it.product(counts.items(), container.open))
 
-    c, cell = products[0]
+    (k, v), cell = products[0]
 
-    assert Policy.is_not_hidden_single(c[0], c[1], cell, container.known) is True
+    assert Policy.is_not_hidden_single(k, v, cell, container.known) is True
 
-    c, cell = products[5]
+    (k, v), cell = products[5]
 
-    assert Policy.is_not_hidden_single(c[0], c[1], cell, container.known) is False
+    assert Policy.is_not_hidden_single(k, v, cell, container.known) is False
