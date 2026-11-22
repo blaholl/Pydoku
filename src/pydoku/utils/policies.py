@@ -9,7 +9,9 @@ if TYPE_CHECKING:
 
 class Policy:
     @staticmethod
-    def is_not_hidden_single(k: int, v: int, cell: Cell, solutions: list[int]) -> bool:
+    def is_not_hidden_single(
+        k: int = 0, v: int = 0, cell: Cell = None, solutions: list[int] | None = None
+    ) -> bool:
         return any([v != 1, k not in cell.can, k in solutions])
 
     @staticmethod
@@ -20,4 +22,10 @@ class Policy:
                 mi.all_equal(c, lambda x: x.col),
                 mi.all_equal(c, lambda x: x.house),
             ]
+        )
+
+    @staticmethod
+    def is_triple_candidate(cell: Cell, triple: list[int]) -> bool:
+        return len(set(cell.can) | set(triple)) in [2, 3] and set(triple) >= set(
+            cell.can
         )
