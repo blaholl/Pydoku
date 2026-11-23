@@ -223,7 +223,7 @@ class Board:
         result: bool = False
 
         for container in self.open:
-            if len(container.open) <= 4:
+            if len(container.open) <= 5:
                 continue
             for ht in HiddenTriple(container):
                 self.evaluate_result(ht)

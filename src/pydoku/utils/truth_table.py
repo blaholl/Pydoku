@@ -16,9 +16,12 @@ def truth_table(variables: list[str], expression: Callable) -> None:
         print(row)
 
 
-def table(P, T, D) -> bool:
-    return (P and D) or (T and not D)
+def table(P, T) -> bool:
+    nums = list(range(1, 10))
+    can = [1, 2, 3, 4]
+    sol = [5, 6, 7, 8, 9]
+    return (P in nums and P != 1) or (T not in can) or (T in sol)
 
 
 if __name__ == "__main__":
-    truth_table(["P", "T", "D"], table)
+    truth_table(["P", "T"], table)

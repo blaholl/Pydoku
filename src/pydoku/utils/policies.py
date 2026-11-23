@@ -29,3 +29,13 @@ class Policy:
         return len(set(cell.can) | set(triple)) in [2, 3] and set(triple) >= set(
             cell.can
         )
+
+    @staticmethod
+    def is_not_intersect_or_subset(combi: list[int], cell: Cell) -> bool:
+        intersect = set(combi) & set(cell.can)
+        return all(
+            [
+                len(intersect) >= 1,
+                intersect <= set(combi),
+            ]
+        )

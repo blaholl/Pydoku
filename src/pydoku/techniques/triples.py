@@ -23,26 +23,22 @@ class NakedTriple(Technique):
 
     def __call__(self) -> Generator[Result]:
         groups = [cell for cell in self.container.open if len(cell) in [2, 3]]
-        triples: list[int] = []
         candidate_cells: list[Cell] = []
 
-        combis = it.combinations(groups, 3)
-        for i, combi in enumerate(combis):
+        for combi in it.combinations(groups, 3):
             target = list(reduce(set.union, [set(c.can) for c in combi]))
 
             if len(target) != 3:
                 continue
 
-            triples.append(target)
-
-            for cell, triple in it.product(groups, triples):
+            for cell, triple in it.product(groups, [target]):
                 if not Policy.is_triple_candidate(cell, triple):
                     continue
 
                 candidate_cells.append(cell)
 
             if not candidate_cells:
-                return NoOp()
+                continue
 
             to_exclude: set[int] = set(mi.flatten(c.can for c in candidate_cells))
             exclusion_cells = [
@@ -58,4 +54,30 @@ class HiddenTriple(Technique):
         self.container = container
 
     def __call__(self) -> Generator[Result]:
-        pass
+        candidates: list[int] = []
+        counts = self.container.get_counts()
+
+        for k, v in counts.items():
+            if v not in [2, 3]:
+                continue
+            candidates.append(k)
+
+        if not candidates or len(candidates) < 3:
+            return NoOp()
+
+        for combi in it.combinations(candidates, 3):
+            candidate_cells: list[Cell] = []
+            for cell in self.container.open:
+                if not Policy.is_not_intersect_or_subset(combi, cell):
+                    continue
+
+                candidate_cells.append(cell)
+
+            if len(candidate_cells) != 3:
+                continue
+
+            to_exclude: set[int] = set(
+                mi.flatten(set(c.can) - set(combi) for c in candidate_cells)
+            )
+
+            yield Excluded(candidate_cells, to_exclude)

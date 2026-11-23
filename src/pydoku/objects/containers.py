@@ -62,7 +62,7 @@ class Container[T](UserList):
 
     @property
     def solved(self) -> bool:
-        return self._solved
+        return self.is_solved()
 
     @solved.setter
     def solved(self) -> bool:
@@ -128,7 +128,13 @@ class Container[T](UserList):
         yield from self.cells
 
     def is_solved(self) -> bool:
-        return all([len(self.closed) == 9, all(c.solved for c in self._cells)])
+        return all(
+            [
+                len(self.closed) == 9,
+                all(c.solved for c in self._cells),
+                len({c.solution for c in self._cells}) == 9,
+            ]
+        )
 
     def _check_open_cells(self) -> list[Cell]:
         self._known = [cell.solution for cell in self.closed]
