@@ -187,7 +187,7 @@ class Board:
         result: bool = False
 
         for container in self.open:
-            if len(container.open) <= 4:
+            if len(container.open) < 4:
                 continue
             for nd in NakedDouble(container):
                 self.evaluate_result(nd)
@@ -199,7 +199,7 @@ class Board:
         result: bool = False
 
         for container in self.open:
-            if len(container.open) <= 4:
+            if len(container.open) < 4:
                 continue
             for hd in HiddenDouble(container):
                 self.evaluate_result(hd)

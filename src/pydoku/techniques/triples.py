@@ -1,8 +1,6 @@
 import itertools as it
-
-# from collections import Counter
 from collections.abc import Generator
-from functools import reduce
+from functools import cache, reduce
 from typing import TYPE_CHECKING
 
 import more_itertools as mi
@@ -16,6 +14,7 @@ if TYPE_CHECKING:
     from ..objects.containers import Container
 
 
+@cache
 class NakedTriple(Technique):
     def __init__(self, container: Container) -> None:
         super().__init__(container)
@@ -48,6 +47,7 @@ class NakedTriple(Technique):
             yield Excluded(exclusion_cells, to_exclude)
 
 
+@cache
 class HiddenTriple(Technique):
     def __init__(self, container: Container) -> None:
         super().__init__(container)
@@ -68,7 +68,7 @@ class HiddenTriple(Technique):
         for combi in it.combinations(candidates, 3):
             candidate_cells: list[Cell] = []
             for cell in self.container.open:
-                if not Policy.is_not_intersect_or_subset(combi, cell):
+                if not Policy.is_intersect_and_subset(combi, cell):
                     continue
 
                 candidate_cells.append(cell)

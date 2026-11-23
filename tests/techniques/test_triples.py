@@ -41,6 +41,17 @@ def get_board_ht_from_file() -> Board:
     return board
 
 
+@pytest.fixture
+def get_board_2nd_ht_from_file() -> Board:
+    file_path: Path = Path("./tests/data/test-puzzles.json")
+    level = "hidden_triple"
+    puz = 2
+
+    board: Board = Board.from_puzzle(puzzle_path=file_path, level=level, num=puz)
+    board.populate()
+    return board
+
+
 def test_naked_triple(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
     board.populate()
@@ -88,3 +99,26 @@ def test_hidden_triple(get_board_ht_from_file: Board) -> None:
     assert all(9 in house[i] for i in [7, 9])
     assert all(6 not in house[i] for i in [4, 7, 9])
     assert all(8 not in house[i] for i in [7, 9])
+
+
+def test_second_hidden_triple(get_board_2nd_ht_from_file: Board) -> None:
+    board: Board = get_board_2nd_ht_from_file
+    board.populate()
+
+    board.check_naked_double()
+
+    house = board.houses[1]
+    assert all(5 in house[i] for i in [4, 6])
+    assert all(6 in house[i] for i in [1, 4, 6])
+    assert all(8 in house[i] for i in [1, 4])
+    assert all(3 in house[i] for i in [1, 4, 6])
+    assert all(4 in house[i] for i in [1, 4, 6])
+
+    board.check_hidden_triple()
+    assert all(5 in house[i] for i in [4, 6])
+    assert all(6 in house[i] for i in [1, 4, 6])
+    assert all(8 in house[i] for i in [1, 4])
+    assert all(3 not in house[i] for i in [1, 4, 6])
+    assert all(4 not in house[i] for i in [1, 4, 6])
+
+    board.show()

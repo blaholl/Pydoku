@@ -31,7 +31,7 @@ class Policy:
         )
 
     @staticmethod
-    def is_not_intersect_or_subset(combi: list[int], cell: Cell) -> bool:
+    def is_intersect_and_subset(combi: list[int], cell: Cell) -> bool:
         intersect = set(combi) & set(cell.can)
         return all(
             [
