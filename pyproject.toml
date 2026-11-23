@@ -17,6 +17,7 @@ dependencies = [
     "sphinx>=9.2.0",
     "ruff>=0.17.2",
     "click>=8.5.0",
+    "networkx>=3.7",
 ]
 
 [build-system]
@@ -40,6 +41,7 @@ pydoku = "pydoku.__main__:cli"
 common = [
     "click>=8.5.0",
     "more-itertools>=11.2.1",
+    "networkx>=3.7",
     "rich>=15.0.0",
 ]
 dev = [

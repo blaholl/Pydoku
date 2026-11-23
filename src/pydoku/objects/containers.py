@@ -1,7 +1,7 @@
 import itertools as it
 from collections import Counter, UserList, defaultdict
 from collections.abc import Iterable, Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Generic
 
 import more_itertools as mi
@@ -14,10 +14,33 @@ type C = Generic[C]
 
 @dataclass
 class Sightline:
-    idx: int
     row: Row
     col: Column
     house: House
+    idx: int = None
+
+    _open: Iterator[Cell] = field(default_factory=list)
+    _solved: Iterator[Cell] = field(default_factory=list)
+
+    @property
+    def open(self) -> Iterator[Cell]:
+        return mi.flatten([self.row.open, self.col.open, self.house.open])
+
+    @open.setter
+    def open(self) -> Iterator[Cell]:
+        self._open = mi.flatten([self.row.open, self.col.open, self.house.open])
+
+    @property
+    def solved(self) -> Iterator[Cell]:
+        return mi.flatten([self.row.open, self.col.open, self.house.open])
+
+    @solved.setter
+    def solved(self) -> Iterator[Cell]:
+        self._solved = mi.flatten([self.row.open, self.col.open, self.house.open])
+
+    def propogate(self, ans: int) -> None:
+        for cell in self.open:
+            cell.pop(ans)
 
 
 class Container[T](UserList):
@@ -39,7 +62,7 @@ class Container[T](UserList):
 
     @property
     def solved(self) -> bool:
-        return self._solved
+        return self.is_solved()
 
     @solved.setter
     def solved(self) -> bool:
@@ -105,7 +128,13 @@ class Container[T](UserList):
         yield from self.cells
 
     def is_solved(self) -> bool:
-        return all([len(self.closed) == 9, all(c.solved for c in self._cells)])
+        return all(
+            [
+                len(self.closed) == 9,
+                all(c.solved for c in self._cells),
+                len({c.solution for c in self._cells}) == 9,
+            ]
+        )
 
     def _check_open_cells(self) -> list[Cell]:
         self._known = [cell.solution for cell in self.closed]

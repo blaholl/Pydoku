@@ -6,14 +6,18 @@ from .singles import HiddenSingle as HiddenSingle
 from .singles import NakedSingle as NakedSingle
 from .triples import HiddenTriple as HiddenTriple
 from .triples import NakedTriple as NakedTriple
+from .tuples import LockedCandidate as LockedCandidate
+from .tuples import PointingTuple as PointingTuple
 
 __all__ = [
     "HiddenDouble",
     "HiddenQuadruple",
     "HiddenSingle",
     "HiddenTriple",
+    "LockedCandidate",
     "NakedDouble",
     "NakedQuadruple",
     "NakedSingle",
     "NakedTriple",
+    "PointingTuple",
 ]

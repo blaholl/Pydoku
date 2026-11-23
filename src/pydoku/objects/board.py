@@ -67,17 +67,17 @@ class Board:
             mi.flatten([self.rows, self.columns, self.houses])
         )
 
-        self._open: list[Container] = (
+        self._open: Iterable[Container] = (
             self.rows.open + self.columns.open + self.houses.open
         )
 
     @property
-    def open(self) -> list[Containers]:
-        return self.rows.open + self.columns.open + self.houses.open
+    def open(self) -> Iterable[Containers]:
+        return list(self._open)
 
     @open.setter
-    def open(self) -> list[Containers]:
-        self._open = self.rows.open + self.columns.open + self.houses.open
+    def open(self) -> Iterable[Containers]:
+        self._open = mi.flatten(self.rows.open + self.columns.open + self.houses.open)
 
     def set_puzzle(self, puzzle_path: str, level: str, num: int) -> None:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
@@ -92,18 +92,20 @@ class Board:
 
     @singledispatchmethod
     def get_cell_sightline(self, cell: Cell, open: bool = False) -> Sightline:
-        if open:
-            return Sightline(
+        if not open:
+            sightline = Sightline(
                 idx=cell.idx,
-                row=self.rows[cell.row].open,
-                col=self.columns[cell.col].open,
-                house=self.houses[cell.house].open,
+                row=self.rows[cell.row],
+                col=self.columns[cell.col],
+                house=self.houses[cell.house],
             )
+            cell.sightline = sightline
+            return sightline
         return Sightline(
             idx=cell.idx,
-            row=self.rows[cell.row],
-            col=self.columns[cell.col],
-            house=self.houses[cell.house],
+            row=self.rows[cell.row].open,
+            col=self.columns[cell.col].open,
+            house=self.houses[cell.house].open,
         )
 
     @get_cell_sightline.register(NoneType)
@@ -135,16 +137,16 @@ class Board:
             cell.exc = known
             cell.can = set(range(1, 10)) - known
 
+        for cell in self.cells:
+            cell.sightline = self.get_cell_sightline(cell)
+
     @singledispatchmethod
     def evaluate_result(self, _: NoOp) -> None:
         pass
 
     @evaluate_result.register(Solved)
     def _(self, result: Solved) -> None:
-        c: Cell
-        sl: Sightline = self.get_cell_sightline(result.cell, open=True)
-        for c in mi.flatten((sl.row, sl.col, sl.house)):
-            c.pop(result.cell.solution)
+        result.cell.sightline.propogate(result.cell.solution)
 
     @evaluate_result.register(Excluded)
     def _(self, result: Excluded) -> None:
@@ -163,11 +165,8 @@ class Board:
 
         display_board(self)
 
-    def _gatheropen(self) -> Iterable[Container]:
-        return mi.flatten([self.rows.open, self.columns.open, self.houses.open])
-
     def check_naked_single(self) -> bool:
-        result = False
+        result: bool = False
         for row in self.rows.open:
             for ns in NakedSingle(row):
                 self.evaluate_result(ns)
@@ -176,7 +175,7 @@ class Board:
         return result
 
     def check_hidden_single(self) -> bool:
-        result = False
+        result: bool = False
         for container in self.open:
             for hs in HiddenSingle(container):
                 self.evaluate_result(hs)
@@ -185,11 +184,11 @@ class Board:
         return result
 
     def check_naked_double(self) -> bool:
-        result = False
-        if len(self.open) <= 2:
-            return result
+        result: bool = False
 
         for container in self.open:
+            if len(container.open) < 4:
+                continue
             for nd in NakedDouble(container):
                 self.evaluate_result(nd)
                 result = True
@@ -197,13 +196,37 @@ class Board:
         return result
 
     def check_hidden_double(self) -> bool:
-        result = False
-        if len(self.open) <= 2:
-            return result
+        result: bool = False
 
         for container in self.open:
+            if len(container.open) < 4:
+                continue
             for hd in HiddenDouble(container):
                 self.evaluate_result(hd)
+                result = True
+
+        return result
+
+    def check_naked_triple(self) -> bool:
+        result: bool = False
+
+        for container in self.open:
+            if len(container.open) <= 4:
+                continue
+            for nt in NakedTriple(container):
+                self.evaluate_result(nt)
+                result = True
+
+        return result
+
+    def check_hidden_triple(self) -> bool:
+        result: bool = False
+
+        for container in self.open:
+            if len(container.open) <= 5:
+                continue
+            for ht in HiddenTriple(container):
+                self.evaluate_result(ht)
                 result = True
 
         return result

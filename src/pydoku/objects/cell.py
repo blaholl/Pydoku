@@ -1,8 +1,12 @@
 from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import singledispatchmethod
+from typing import TYPE_CHECKING
 
 from ..utils import EmptyCellError, IllegalAnswerError
+
+if TYPE_CHECKING:
+    from .containers import Sightline
 
 
 @dataclass
@@ -37,6 +41,8 @@ class Cell:
         self._exc: set[int] = set()
         self._can: set[int] = set()
         self._bival: bool = False
+
+        self.sightline: Sightline = None
 
     @property
     def exc(self) -> list[int]:
