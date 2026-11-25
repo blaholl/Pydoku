@@ -212,7 +212,7 @@ class Board:
         return all(
             [
                 (con.is_solved() for con in self.containers),
-                self._phistomefel_ring.compare() is True,
+                self.phistomefel_ring.compare() is True,
             ]
         )
 
