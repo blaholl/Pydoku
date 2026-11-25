@@ -84,18 +84,14 @@ class Board:
         self._phistomefel_ring: PhistomefelRing = None
 
     @property
-    def open(self) -> Iterable[Containers]:
+    def open(self) -> Iterable[Container]:
         return list(self._open)
 
     @open.setter
-    def open(self) -> Iterable[Containers]:
+    def open(self) -> Iterable[Container]:
         self._open = mi.flatten(self.rows.open + self.columns.open + self.houses.open)
 
     @property
-    def phistomefel_ring(self) -> PhistomefelRing:
-        return self._set_phistomefel_ring()
-
-    @phistomefel_ring.setter
     def phistomefel_ring(self) -> PhistomefelRing:
         return self._set_phistomefel_ring()
 
@@ -138,12 +134,12 @@ class Board:
             + [house_6[i] for i in [1, 4, 7]]
         )
 
-        self._phistomefel_ring = PhistomefelRing(
+        return PhistomefelRing(
             outer=[c.solution for c in outer_cells if c.solved],
             inner=[c.solution for c in inner_cells if c.solved],
         )
 
-        return self._phistomefel_ring
+        # return phistomefel_ring
 
     @singledispatchmethod
     def get_cell_sightline(self, cell: Cell, open: bool = False) -> Sightline:
@@ -211,7 +207,7 @@ class Board:
     def verify(self) -> bool:
         return all(
             [
-                (con.is_solved() for con in self.containers),
+                (con.solved for con in self.containers),
                 self.phistomefel_ring.compare() is True,
             ]
         )

@@ -52,8 +52,6 @@ def test_naked_double(get_board_from_file: Board) -> None:
 
     assert board.verify() is True
 
-    board.show()
-
 
 def test_hidden_double(get_board_hd_from_file: Board) -> None:
     board: Board = get_board_hd_from_file
@@ -67,8 +65,6 @@ def test_hidden_double(get_board_hd_from_file: Board) -> None:
     result: bool = board.check_hidden_double()
     assert result is True
     board.check_naked_double()
-
-    # board.show()
 
     assert 5 in board.index.get(49)
     assert 5 in board.index.get(51)
@@ -100,7 +96,3 @@ def test_hidden_double(get_board_hd_from_file: Board) -> None:
     board.check_naked_single()
     board.check_hidden_single()
     board.check_naked_single()
-
-    # assert board.verify() is True
-
-    # board.show()

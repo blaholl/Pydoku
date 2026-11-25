@@ -31,7 +31,7 @@ source = "uv-dynamic-versioning"
 packages = ["src/pydoku"]
 
 [tool.uv-dynamic-versioning]
-style = "pep440"        # also "semver" or "pvp"
+style = "pep440"
 pattern = "default"
 
 [project.scripts]
@@ -62,3 +62,13 @@ test = [
     { include-group = "docs" },
     { include-group = "lint" },
 ]
+
+[tool.pytest.ini_options]
+addopts = "-q --cov=tests/ --cov-report=xml:coverage.xml --cov-report=html:py-coverage --cov-report=term-missing:skip-covered"
+
+testpaths = [
+    "tests"
+]
+
+python_files = ["test_*.py"]
+python_functions = ["test_*"]

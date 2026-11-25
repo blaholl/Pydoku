@@ -210,8 +210,6 @@ def test_phisto_ring_incomplete() -> None:
     assert ring.diff() == 3
     assert ring.inner_count != ring.outer_count
 
-    print(ring.count_diff())
-
 
 def test_set_phisto_ring(get_populated_board: Board) -> None:
     board: Board = get_populated_board

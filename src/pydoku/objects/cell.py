@@ -40,7 +40,7 @@ class Cell:
 
         self._exc: set[int] = set()
         self._can: set[int] = set()
-        self._bival: bool = False
+        self._bival: bool = len(self._can) == 2
 
         self.sightline: Sightline = None
 
@@ -75,10 +75,6 @@ class Cell:
     @property
     def bival(self) -> bool:
         return len(self._can) == 2
-
-    @bival.setter
-    def bival(self) -> bool:
-        self._bival = self.bival
 
     def __repr__(self) -> str:
         base: str = f"{self.__class__.__name__}(idx={self.idx}, row={self.pos.r}, column={self.pos.c}, house={self.pos.h}, can={self.can}, exc={self.exc}"
