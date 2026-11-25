@@ -31,7 +31,15 @@ class Solver:
             self.board.check_naked_double()
             self.cleanup()
 
+        if self.board.check_locked_candidate() or self.board.check_pointing_tuple():
+            self.board.check_hidden_double()
+            self.board.check_naked_double()
+            self.cleanup()
+
         if self.board.check_naked_triple():
+            self.cleanup()
+
+        if self.board.check_hidden_triple():
             self.cleanup()
 
     def cleanup(self) -> None:

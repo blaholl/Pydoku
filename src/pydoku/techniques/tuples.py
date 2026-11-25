@@ -1,4 +1,3 @@
-# import itertools as it
 from collections import defaultdict
 from collections.abc import Generator
 from typing import TYPE_CHECKING
@@ -104,7 +103,6 @@ class PointingTuple(Technique):
                     if cell not in candidate_cells and k in cell
                 ]
 
-                print(k, exclusion_cells)
                 yield Excluded(exclusion_cells, to_exclude)
 
             yield NoOp()

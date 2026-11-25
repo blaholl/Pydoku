@@ -12,7 +12,17 @@ from ..utils.construct_board import construct_cells, load_puzzle, set_board
 from ..utils.display import display_board, display_verify
 from ..utils.result import Excluded, NoOp, Solved
 from .cell import Cell
-from .containers import Column, Columns, Container, House, Houses, Row, Rows, Sightline
+from .containers import (
+    Column,
+    Columns,
+    Container,
+    House,
+    Houses,
+    PhistomefelRing,
+    Row,
+    Rows,
+    Sightline,
+)
 
 type Puzzle = list[int]
 
@@ -71,6 +81,8 @@ class Board:
             self.rows.open + self.columns.open + self.houses.open
         )
 
+        self._phistomefel_ring: PhistomefelRing = None
+
     @property
     def open(self) -> Iterable[Containers]:
         return list(self._open)
@@ -78,6 +90,14 @@ class Board:
     @open.setter
     def open(self) -> Iterable[Containers]:
         self._open = mi.flatten(self.rows.open + self.columns.open + self.houses.open)
+
+    @property
+    def phistomefel_ring(self) -> PhistomefelRing:
+        return self._set_phistomefel_ring()
+
+    @phistomefel_ring.setter
+    def phistomefel_ring(self) -> PhistomefelRing:
+        return self._set_phistomefel_ring()
 
     def set_puzzle(self, puzzle_path: str, level: str, num: int) -> None:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
@@ -89,6 +109,41 @@ class Board:
         board = cls()
         set_board(board.index.values(), puzzle)
         return board
+
+    def _set_phistomefel_ring(self) -> PhistomefelRing:
+        col_1, col_2, col_8, col_9 = (
+            self.columns[1],
+            self.columns[2],
+            self.columns[8],
+            self.columns[9],
+        )
+        outer_range = [1, 2, 8, 9]
+        outer_cells = (
+            [col_1[i] for i in outer_range]
+            + [col_2[i] for i in outer_range]
+            + [col_8[i] for i in outer_range]
+            + [col_9[i] for i in outer_range]
+        )
+        row_3, row_7, house_4, house_6 = (
+            self.rows[3],
+            self.rows[7],
+            self.houses[4],
+            self.houses[6],
+        )
+        row_range = range(3, 8)
+        inner_cells = (
+            [row_3[i] for i in row_range]
+            + [row_7[i] for i in row_range]
+            + [house_4[i] for i in [3, 6, 9]]
+            + [house_6[i] for i in [1, 4, 7]]
+        )
+
+        self._phistomefel_ring = PhistomefelRing(
+            outer=[c.solution for c in outer_cells if c.solved],
+            inner=[c.solution for c in inner_cells if c.solved],
+        )
+
+        return self._phistomefel_ring
 
     @singledispatchmethod
     def get_cell_sightline(self, cell: Cell, open: bool = False) -> Sightline:
@@ -154,7 +209,12 @@ class Board:
             cell.pop(num)
 
     def verify(self) -> bool:
-        return all(con.is_solved() for con in self.containers)
+        return all(
+            [
+                (con.is_solved() for con in self.containers),
+                self._phistomefel_ring.compare() is True,
+            ]
+        )
 
     def show(self, verify: bool = False, *, print_verify: bool = False) -> None:
         if verify:

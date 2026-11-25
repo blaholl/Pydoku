@@ -105,7 +105,7 @@ def test_3rd_pointing_tuple(get_board_from_file: Board) -> None:
     [(1, "pointing_tuple")],
     indirect=True,
 )
-def test_2nd_pointing_tuple(get_board_from_file: Board) -> None:
+def test_no_pointing_tuple(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     res = board.check_pointing_tuple()

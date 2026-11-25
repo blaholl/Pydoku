@@ -211,3 +211,23 @@ def test_phisto_ring_incomplete() -> None:
     assert ring.inner_count != ring.outer_count
 
     print(ring.count_diff())
+
+
+def test_set_phisto_ring(get_populated_board: Board) -> None:
+    board: Board = get_populated_board
+    board.populate()
+
+    phisto: PhistomefelRing = board.phistomefel_ring
+    assert phisto.compare() is False
+    assert phisto.diff() == 2
+    assert len(phisto.count_diff()) == 2
+
+    board.check_naked_single()
+    board.check_hidden_single()
+
+    phisto: PhistomefelRing = board.phistomefel_ring
+    assert phisto.compare() is True
+    assert phisto.diff() == 0
+    assert len(phisto.count_diff()) == 0
+
+    assert board.verify() is True
