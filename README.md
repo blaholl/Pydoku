@@ -31,13 +31,13 @@ The goal is to test against 100 games per category and then a further 100 "skull
 Current results:
 |  Complete | Level | Successful Solves | Total puzzles | % |
 | --- | --- | --- | --- | --- |
-| <style>span[class="checked"]{color: green;}</style> | Beginner | 100 | 100 | 100% |
-| <style>span[class="checked"]{color: green;}</style> | Advanced | 100 | 100 | 100% |
-| <style>span[class="unchecked"]{color: red;}</style> | Expert | 95 | 100 | 95% |
-| <style>span[class="unchecked"]{color: red;}</style> | Pro | 4 | 100 | 4% |
-| <style>span[class="unchecked"]{color: red;}</style> | Impossible 1 (Core) | - | 30 | - |
-| <style>span[class="unchecked"]{color: red;}</style> | Impossible 2 (Extended) | - | - | - |
-| <style>span[class="unchecked"]{color: red;}</style> | Total | 299 | 400 | 74.75% |
+| [x] | Beginner | 100 | 100 | 100% |
+| [x] | Advanced | 100 | 100 | 100% |
+| [ ] | Expert | 95 | 100 | 95% |
+| [ ] | Pro | 4 | 100 | 4% |
+| [ ] | Impossible 1 (Core) | - | 30 | - |
+| [ ] | Impossible 2 (Extended) | - | - | - |
+| [ ] | Total | 299 | 400 | 74.75% |
 
 ## Implemented Techniques
 
