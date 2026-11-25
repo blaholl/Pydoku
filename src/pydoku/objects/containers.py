@@ -88,19 +88,15 @@ class Container[T](UserList):
 
     @property
     def solved(self) -> bool:
-        return self.is_solved()
+        return self._solved
 
     @solved.setter
     def solved(self) -> bool:
-        return self.is_solved()
+        self._solved = self.is_solved()
 
     @property
     def cells(self) -> list[Cell]:
         return self.data
-
-    @cells.setter
-    def cells(self) -> list[Cell]:
-        self._cells = self.data
 
     @property
     def open(self) -> list[Cell]:
@@ -113,10 +109,6 @@ class Container[T](UserList):
     @property
     def closed(self) -> list[Cell]:
         return [cell for cell in self.data if cell.solved]
-
-    @closed.setter
-    def closed(self) -> list[Cell]:
-        self._closed = [cell for cell in self.data if cell.solved]
 
     @property
     def known(self) -> list[int]:

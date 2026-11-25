@@ -117,5 +117,3 @@ def test_second_hidden_triple(get_board_2nd_ht_from_file: Board) -> None:
     assert all(8 in house[i] for i in [1, 4])
     assert all(3 not in house[i] for i in [1, 4, 6])
     assert all(4 not in house[i] for i in [1, 4, 6])
-
-    board.show()

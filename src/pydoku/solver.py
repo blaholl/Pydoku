@@ -21,7 +21,27 @@ class Solver:
 
         return cls(board)
 
-    def solve(self) -> None:
+    def cleanup(self) -> None:
+        if self.board.check_naked_single() or self.board.check_hidden_single():
+            self.cleanup()
+
+    def solve(self, rounds: int = 3) -> None:
+        solved: bool = False
+        round: int = 1
+        while solved is False or round <= rounds:
+            if self.board.verify():
+                solved = True
+                break
+
+            self.run()
+
+            if round >= rounds:
+                break
+            round += 1
+
+        return self.board.verify()
+
+    def run(self) -> None:
         self.cleanup()
 
         if self.board.check_naked_double():
@@ -41,10 +61,3 @@ class Solver:
 
         if self.board.check_hidden_triple():
             self.cleanup()
-
-    def cleanup(self) -> None:
-        if self.board.check_naked_single():
-            res = self.board.check_hidden_single()
-
-            if res:
-                self.cleanup()
