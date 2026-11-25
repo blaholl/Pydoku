@@ -6,6 +6,12 @@ import pytest
 from pydoku.objects import Board
 from pydoku.solver import Solver
 
+"""
+Beginner - 100/100 Passed
+Advanced - 99/100 Passed -> 71
+Expert   - 38/100 Passed
+"""
+
 
 @pytest.fixture(params=["puzzle", "level"])
 def get_boards_from_file(request: pytest.FixtureRequest) -> Generator[Board]:

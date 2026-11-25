@@ -12,7 +12,17 @@ from ..utils.construct_board import construct_cells, load_puzzle, set_board
 from ..utils.display import display_board, display_verify
 from ..utils.result import Excluded, NoOp, Solved
 from .cell import Cell
-from .containers import Column, Columns, Container, House, Houses, Row, Rows, Sightline
+from .containers import (
+    Column,
+    Columns,
+    Container,
+    House,
+    Houses,
+    PhistomefelRing,
+    Row,
+    Rows,
+    Sightline,
+)
 
 type Puzzle = list[int]
 
@@ -71,6 +81,8 @@ class Board:
             self.rows.open + self.columns.open + self.houses.open
         )
 
+        self._phistomefel_ring: PhistomefelRing = None
+
     @property
     def open(self) -> Iterable[Containers]:
         return list(self._open)
@@ -78,6 +90,14 @@ class Board:
     @open.setter
     def open(self) -> Iterable[Containers]:
         self._open = mi.flatten(self.rows.open + self.columns.open + self.houses.open)
+
+    @property
+    def phistomefel_ring(self) -> PhistomefelRing:
+        return self._set_phistomefel_ring()
+
+    @phistomefel_ring.setter
+    def phistomefel_ring(self) -> PhistomefelRing:
+        return self._set_phistomefel_ring()
 
     def set_puzzle(self, puzzle_path: str, level: str, num: int) -> None:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
@@ -89,6 +109,41 @@ class Board:
         board = cls()
         set_board(board.index.values(), puzzle)
         return board
+
+    def _set_phistomefel_ring(self) -> PhistomefelRing:
+        col_1, col_2, col_8, col_9 = (
+            self.columns[1],
+            self.columns[2],
+            self.columns[8],
+            self.columns[9],
+        )
+        outer_range = [1, 2, 8, 9]
+        outer_cells = (
+            [col_1[i] for i in outer_range]
+            + [col_2[i] for i in outer_range]
+            + [col_8[i] for i in outer_range]
+            + [col_9[i] for i in outer_range]
+        )
+        row_3, row_7, house_4, house_6 = (
+            self.rows[3],
+            self.rows[7],
+            self.houses[4],
+            self.houses[6],
+        )
+        row_range = range(3, 8)
+        inner_cells = (
+            [row_3[i] for i in row_range]
+            + [row_7[i] for i in row_range]
+            + [house_4[i] for i in [3, 6, 9]]
+            + [house_6[i] for i in [1, 4, 7]]
+        )
+
+        self._phistomefel_ring = PhistomefelRing(
+            outer=[c.solution for c in outer_cells if c.solved],
+            inner=[c.solution for c in inner_cells if c.solved],
+        )
+
+        return self._phistomefel_ring
 
     @singledispatchmethod
     def get_cell_sightline(self, cell: Cell, open: bool = False) -> Sightline:
@@ -154,7 +209,12 @@ class Board:
             cell.pop(num)
 
     def verify(self) -> bool:
-        return all(con.is_solved() for con in self.containers)
+        return all(
+            [
+                (con.is_solved() for con in self.containers),
+                self.phistomefel_ring.compare() is True,
+            ]
+        )
 
     def show(self, verify: bool = False, *, print_verify: bool = False) -> None:
         if verify:
@@ -167,10 +227,12 @@ class Board:
 
     def check_naked_single(self) -> bool:
         result: bool = False
-        for row in self.rows.open:
-            for ns in NakedSingle(row):
+
+        for container in self.open:
+            for ns in NakedSingle(container):
                 self.evaluate_result(ns)
-                result = True
+                if not isinstance(ns, NoOp):
+                    result = True
 
         return result
 
@@ -179,7 +241,8 @@ class Board:
         for container in self.open:
             for hs in HiddenSingle(container):
                 self.evaluate_result(hs)
-                result = True
+                if not isinstance(hs, NoOp):
+                    result = True
 
         return result
 
@@ -191,7 +254,8 @@ class Board:
                 continue
             for nd in NakedDouble(container):
                 self.evaluate_result(nd)
-                result = True
+                if not isinstance(nd, NoOp):
+                    result = True
 
         return result
 
@@ -203,7 +267,8 @@ class Board:
                 continue
             for hd in HiddenDouble(container):
                 self.evaluate_result(hd)
-                result = True
+                if not isinstance(hd, NoOp):
+                    result = True
 
         return result
 
@@ -215,7 +280,8 @@ class Board:
                 continue
             for nt in NakedTriple(container):
                 self.evaluate_result(nt)
-                result = True
+                if not isinstance(nt, NoOp):
+                    result = True
 
         return result
 
@@ -227,6 +293,61 @@ class Board:
                 continue
             for ht in HiddenTriple(container):
                 self.evaluate_result(ht)
-                result = True
+                if not isinstance(ht, NoOp):
+                    result = True
+
+        return result
+
+    def check_pointing_tuple(self) -> bool:
+        result: bool = False
+
+        houses: list[House] = [house for house in self.houses if not house.solved]
+        for house in houses:
+            rows = [
+                self.rows[i]
+                for i in house.row_intersections
+                if not self.rows[i].solved and len(self.rows[i]) >= 3
+            ]
+            for pt in PointingTuple(house, rows):
+                self.evaluate_result(pt)
+                if not isinstance(pt, NoOp):
+                    result = True
+
+            cols = [
+                self.columns[i]
+                for i in house.col_intersections
+                if not self.columns[i].solved and len(self.columns[i]) >= 3
+            ]
+            for pt in PointingTuple(house, cols):
+                self.evaluate_result(pt)
+                if not isinstance(pt, NoOp):
+                    result = True
+
+        return result
+
+    def check_locked_candidate(self) -> bool:
+        result: bool = False
+
+        houses: list[House] = [house for house in self.houses if not house.solved]
+        for house in houses:
+            rows = [
+                self.rows[i]
+                for i in house.row_intersections
+                if not self.rows[i].solved and len(self.rows[i]) >= 3
+            ]
+            for lc in LockedCandidate(house, rows):
+                self.evaluate_result(lc)
+                if not isinstance(lc, NoOp):
+                    result = True
+
+            cols = [
+                self.columns[i]
+                for i in house.col_intersections
+                if not self.columns[i].solved and len(self.columns[i]) >= 3
+            ]
+            for lc in LockedCandidate(house, cols):
+                self.evaluate_result(lc)
+                if not isinstance(lc, NoOp):
+                    result = True
 
         return result

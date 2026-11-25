@@ -39,3 +39,11 @@ class Policy:
                 intersect <= set(combi),
             ]
         )
+
+    @staticmethod
+    def is_container_count_ge_house_count(
+        k: int, v: int, counts: dict[int, int]
+    ) -> bool:
+        if k not in counts:
+            return
+        return v >= 3 and v >= counts.get(k)
