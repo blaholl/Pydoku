@@ -167,10 +167,12 @@ class Board:
 
     def check_naked_single(self) -> bool:
         result: bool = False
-        for row in self.rows.open:
-            for ns in NakedSingle(row):
+
+        for container in self.open:
+            for ns in NakedSingle(container):
                 self.evaluate_result(ns)
-                result = True
+                if not isinstance(ns, NoOp):
+                    result = True
 
         return result
 
@@ -179,7 +181,8 @@ class Board:
         for container in self.open:
             for hs in HiddenSingle(container):
                 self.evaluate_result(hs)
-                result = True
+                if not isinstance(hs, NoOp):
+                    result = True
 
         return result
 
@@ -191,7 +194,8 @@ class Board:
                 continue
             for nd in NakedDouble(container):
                 self.evaluate_result(nd)
-                result = True
+                if not isinstance(nd, NoOp):
+                    result = True
 
         return result
 
@@ -203,7 +207,8 @@ class Board:
                 continue
             for hd in HiddenDouble(container):
                 self.evaluate_result(hd)
-                result = True
+                if not isinstance(hd, NoOp):
+                    result = True
 
         return result
 
@@ -215,7 +220,8 @@ class Board:
                 continue
             for nt in NakedTriple(container):
                 self.evaluate_result(nt)
-                result = True
+                if not isinstance(nt, NoOp):
+                    result = True
 
         return result
 
@@ -227,6 +233,47 @@ class Board:
                 continue
             for ht in HiddenTriple(container):
                 self.evaluate_result(ht)
-                result = True
+                if not isinstance(ht, NoOp):
+                    result = True
+
+        return result
+
+    def check_pointing_tuple(self) -> bool:
+        result: bool = False
+
+        for container in (con for con in self.open if isinstance(con, House)):
+            if len(container.open) < 4:
+                continue
+            for pt in PointingTuple(container):
+                self.evaluate_result(pt)
+                if not isinstance(pt, NoOp):
+                    result = True
+
+        return result
+
+    def check_locked_candidate(self) -> bool:
+        result: bool = False
+
+        houses: list[House] = [house for house in self.houses if not house.solved]
+        for house in houses:
+            rows = [
+                self.rows[i]
+                for i in house.row_intersections
+                if not self.rows[i].solved and len(self.rows[i]) >= 3
+            ]
+            for lc in LockedCandidate(house, rows):
+                self.evaluate_result(lc)
+                if not isinstance(lc, NoOp):
+                    result = True
+
+            cols = [
+                self.columns[i]
+                for i in house.col_intersections
+                if not self.columns[i].solved and len(self.columns[i]) >= 3
+            ]
+            for lc in LockedCandidate(house, cols):
+                self.evaluate_result(lc)
+                if not isinstance(lc, NoOp):
+                    result = True
 
         return result

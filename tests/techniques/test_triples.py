@@ -1,11 +1,8 @@
-# import itertools as it
 from pathlib import Path
 
 import pytest
 
 from pydoku.objects import Board
-
-# from pydoku.utils.policies import Policy
 
 
 @pytest.fixture

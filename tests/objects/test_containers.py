@@ -4,7 +4,7 @@ import more_itertools as mi
 import pytest
 
 from pydoku.objects import Board, Cell, Column, House, Row
-from pydoku.objects.containers import Columns, Houses, Rows
+from pydoku.objects.containers import Columns, Houses, PhistomefelRing, Rows, StrongLink
 
 
 @pytest.fixture
@@ -21,6 +21,17 @@ def get_populated_board() -> Board:
     puz = 1
 
     board: Board = Board.from_puzzle(puzzle_path=file_path, level=level, num=puz)
+    return board
+
+
+@pytest.fixture
+def get_stronglink_board() -> Board:
+    file_path: Path = Path("./tests/data/test-puzzles.json")
+    level = "locked_candidate"
+    puz = 1
+
+    board: Board = Board.from_puzzle(puzzle_path=file_path, level=level, num=puz)
+    board.populate()
     return board
 
 
@@ -127,3 +138,76 @@ def test_containers_open(get_populated_board: Board) -> None:
     assert len(unsolved_rows) == 9
     assert len(unsolved_cols) == 9
     assert len(unsolved_houses) == 9
+
+
+def test_house_intersections(get_populated_board: Board) -> None:
+    board: Board = get_populated_board
+
+    house: House = board.houses[2]
+    rows = house.row_intersections
+    cols = house.col_intersections
+
+    assert rows == [1, 2, 3]
+    assert cols == [4, 5, 6]
+
+    row: Row = board.rows[1]
+    assert row.intersections == [1, 2, 3]
+
+    col: Column = board.columns[1]
+    assert col.intersections == [1, 4, 7]
+
+
+def test_strong_link(get_stronglink_board: Board) -> None:
+    board: Board = get_stronglink_board
+
+    house = board.houses[7]
+    links = house.get_strong_links()
+
+    assert isinstance(links[0], StrongLink)
+    for link in links:
+        if link.link == 6:
+            assert link.house is True
+            assert link.diagonal is True
+            assert link.row is False
+            assert link.col is False
+        if link.link == 5:
+            assert link.house is True
+            assert link.diagonal is False
+            assert link.row is True
+            assert link.col is False
+
+    column = board.columns[5]
+    c_links = column.get_strong_links()
+
+    link = c_links[0]
+    assert isinstance(link, StrongLink)
+    assert link.house is False
+    assert link.diagonal is False
+    assert link.row is False
+    assert link.col is True
+
+
+def test_phisto_ring() -> None:
+    inner = [9, 8, 6, 3, 4, 8, 7, 5, 3, 5, 8, 4, 6, 3, 2, 7]
+    outer = [3, 6, 8, 4, 8, 7, 3, 6, 7, 9, 5, 3, 4, 5, 2, 8]
+
+    ring = PhistomefelRing(outer=outer, inner=inner)
+
+    assert isinstance(ring, PhistomefelRing)
+    assert ring.compare() is True
+    assert ring.diff() == 0
+    assert ring.inner_count == ring.outer_count
+
+
+def test_phisto_ring_incomplete() -> None:
+    inner = [9, 8, 6, 3, 4, 8, 7, 5, 3, 5, 8, 4, 6]
+    outer = [3, 6, 8, 4, 8, 7, 3, 6, 7, 9, 5, 3, 4, 5, 2, 8]
+
+    ring = PhistomefelRing(outer=outer, inner=inner)
+
+    assert isinstance(ring, PhistomefelRing)
+    assert ring.compare() is False
+    assert ring.diff() == 3
+    assert ring.inner_count != ring.outer_count
+
+    print(ring.count_diff())

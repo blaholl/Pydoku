@@ -43,6 +43,30 @@ class Sightline:
             cell.pop(ans)
 
 
+@dataclass
+class StrongLink:
+    link: int
+    cell_1: Cell
+    cell_2: Cell
+
+    row: bool | None = None
+    col: bool | None = None
+    house: bool | None = None
+    diagonal: bool | None = None
+
+    def __post_init__(self) -> None:
+        self.row = self.cell_1.row == self.cell_2.row
+        self.col = self.cell_1.col == self.cell_2.col
+        self.house = self.cell_1.house == self.cell_2.house
+        self.diagonal = all([self.house is True, self.row is False, self.col is False])
+
+    def __eq__(self, other: StrongLink) -> bool:
+        return self.cell_1 == other.cell_1 and self.cell_2 == other.cell_2
+
+    def __hash__(self) -> int:
+        return hash(self)
+
+
 class Container[T](UserList):
     def __init__(self, idx: int, cells: Iterable[Cell]) -> None:
         self.idx: int = idx
@@ -59,6 +83,8 @@ class Container[T](UserList):
         self._solved: bool = False
 
         self.cache: dict[dict[str, list[Cell]]] = defaultdict(None, defaultdict(list))
+
+        self._strong_links: list[StrongLink] = []
 
     @property
     def solved(self) -> bool:
@@ -109,6 +135,14 @@ class Container[T](UserList):
     def unknown(self) -> list[int]:
         self._unknown = sorted(set(range(1, 10)) - set(self.known))
 
+    @property
+    def strong_links(self) -> list[StrongLink]:
+        return self.get_strong_links()
+
+    @strong_links.setter
+    def strong_links(self) -> None:
+        self._strong_links = self.get_strong_links()
+
     def __hash__(self) -> int:
         return hash((self.idx, *self.cells))
 
@@ -145,23 +179,62 @@ class Container[T](UserList):
     def get_counts(self) -> Counter:
         return Counter(it.chain.from_iterable(cell.can for cell in self._open))
 
+    def get_strong_links(self) -> list[StrongLink]:
+        for k, v in self.get_counts().items():
+            if v != 2:
+                continue
+            pairs: list[Cell] = []
+            for cell in self._open:
+                if k in cell:
+                    pairs.append(cell)
+            if len(pairs) != 2:
+                continue
+
+            s_link = StrongLink(link=k, cell_1=pairs[0], cell_2=pairs[1])
+            self._strong_links.append(s_link)
+        return self._strong_links
+
+    def group_by_house(self) -> dict[int, list[Cell]]:
+        groups: dict[int, list[Cell]] = defaultdict(list)
+
+        for cell in self.open:
+            groups[cell.house].append(cell)
+
+        return groups
+
 
 class Row[T](Container):
     def __init__(self, idx: int, cells: Iterable[Cell]) -> None:
         super().__init__(idx, cells)
         assert mi.all_equal(cell.row for cell in cells) is True
+        self.intersections: list[int] = self._get_intersections()
+
+    def _get_intersections(self) -> list[int]:
+        return sorted({c.house for c in self.cells})
 
 
 class Column[T](Container):
     def __init__(self, idx: int, cells: Iterable[Cell]) -> None:
         super().__init__(idx, cells)
         assert mi.all_equal(cell.col for cell in cells) is True
+        self.intersections: list[int] = self._get_intersections()
+
+    def _get_intersections(self) -> list[int]:
+        return sorted({c.house for c in self.cells})
 
 
 class House[T](Container):
-    def __init__(self, idx: int, cells: Iterable[Cell]):
+    def __init__(self, idx: int, cells: Iterable[Cell]) -> None:
         super().__init__(idx, cells)
         assert mi.all_equal(cell.house for cell in cells) is True
+        self.row_intersections: list[int] = self._get_row_intersections()
+        self.col_intersections: list[int] = self._get_col_intersections()
+
+    def _get_row_intersections(self) -> list[int]:
+        return sorted({c.row for c in self.cells})
+
+    def _get_col_intersections(self) -> list[int]:
+        return sorted({c.col for c in self.cells})
 
 
 class Containers[C](UserList):
@@ -211,3 +284,39 @@ class Columns[C](Containers):
 class Houses[C](Containers):
     def __init__(self, houses: list[House]) -> None:
         super().__init__(houses)
+
+
+@dataclass
+class PhistomefelRing:
+    outer: list[int]
+    inner: list[int]
+
+    outer_count: Counter | None = None
+    inner_count: Counter | None = None
+
+    def __post_init__(self) -> None:
+        self.outer_count = Counter(self.outer)
+        self.inner_count = Counter(self.inner)
+
+    def compare(self) -> bool:
+        return all(
+            [
+                len(self.inner) == len(self.outer),
+                sorted(self.inner) == sorted(self.outer),
+            ]
+        )
+
+    def diff(self) -> int:
+        return abs(len(self.outer) - len(self.inner))
+
+    def count_diff(self) -> dict[int, int]:
+        diffs: dict[int, int] = {}
+
+        for k, v in self.outer_count.items():
+            if k not in self.inner_count:
+                diffs[k] = v
+
+            elif self.inner_count[k] != v:
+                diffs[k] = v - self.inner_count[k]
+
+        return diffs
