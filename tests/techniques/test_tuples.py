@@ -29,7 +29,8 @@ def test_locked_candidate(get_board_from_file: Board) -> None:
     assert all(2 in house_6[i] for i in [2, 4, 5, 7, 8])
     assert all(3 in house_9[i] for i in [1, 3, 5, 7, 8, 9])
 
-    board.check_locked_candidate()
+    res = board.check_locked_candidate()
+    assert res is True
 
     assert all(2 in house_6[i] for i in [4, 7])
     assert all(2 not in house_6[i] for i in [2, 5, 8])
@@ -50,7 +51,8 @@ def test_2nd_locked_candidate(get_board_from_file: Board) -> None:
     assert all(5 in house[i] for i in [5, 6, 8, 9])
     assert all(7 in house_7[i] for i in [1, 3, 5, 7, 8, 9])
 
-    board.check_locked_candidate()
+    res = board.check_locked_candidate()
+    assert res is True
 
     assert all(5 in house[i] for i in [6, 9])
     assert all(5 not in house[i] for i in [5, 8])
@@ -60,34 +62,22 @@ def test_2nd_locked_candidate(get_board_from_file: Board) -> None:
 
 @pytest.mark.parametrize(
     "get_board_from_file",
-    [(1, "pointing_tuple")],
-    indirect=True,
-)
-@pytest.mark.skip("Not implemented")
-def test_pointing_tuple(get_board_from_file: Board) -> None:
-    # board: Board = get_board_from_file
-    pass
-
-
-@pytest.mark.parametrize(
-    "get_board_from_file",
     [(2, "pointing_tuple")],
     indirect=True,
 )
-@pytest.mark.skip("Not implemented")
-def test_2nd_pointing_tuple(get_board_from_file: Board) -> None:
-    # board: Board = get_board_from_file
-    pass
+def test_pointing_tuple(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+
+    col = board.columns[2]
+    assert all(1 in col[i] for i in [3, 5, 6])
+    res = board.check_pointing_tuple()
+    assert res is True
+
+    assert all(1 in col[i] for i in [5, 6])
+    assert 1 not in col[3]
 
 
-pytest.mark.parametrize(
-    "get_board_from_file",
-    [(3, "pointing_tuple")],
-    indirect=True,
-)
-
-
-@pytest.mark.skip("Not implemented")
+@pytest.mark.parametrize("get_board_from_file", [(3, "pointing_tuple")], indirect=True)
 def test_3rd_pointing_tuple(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
@@ -103,7 +93,20 @@ def test_3rd_pointing_tuple(get_board_from_file: Board) -> None:
     col = board.columns[5]
     assert all(4 in col[i] for i in [4, 6, 8])
 
-    board.check_pointing_tuple()
+    res = board.check_pointing_tuple()
+    assert res is True
 
     assert all(4 in col[i] for i in [4, 6])
     assert 4 not in col[8]
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
+    [(1, "pointing_tuple")],
+    indirect=True,
+)
+def test_2nd_pointing_tuple(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+
+    res = board.check_pointing_tuple()
+    assert res is False

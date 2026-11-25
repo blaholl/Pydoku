@@ -241,10 +241,24 @@ class Board:
     def check_pointing_tuple(self) -> bool:
         result: bool = False
 
-        for container in (con for con in self.open if isinstance(con, House)):
-            if len(container.open) < 4:
-                continue
-            for pt in PointingTuple(container):
+        houses: list[House] = [house for house in self.houses if not house.solved]
+        for house in houses:
+            rows = [
+                self.rows[i]
+                for i in house.row_intersections
+                if not self.rows[i].solved and len(self.rows[i]) >= 3
+            ]
+            for pt in PointingTuple(house, rows):
+                self.evaluate_result(pt)
+                if not isinstance(pt, NoOp):
+                    result = True
+
+            cols = [
+                self.columns[i]
+                for i in house.col_intersections
+                if not self.columns[i].solved and len(self.columns[i]) >= 3
+            ]
+            for pt in PointingTuple(house, cols):
                 self.evaluate_result(pt)
                 if not isinstance(pt, NoOp):
                     result = True
