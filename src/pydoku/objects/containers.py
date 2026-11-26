@@ -6,6 +6,7 @@ from typing import Generic
 
 import more_itertools as mi
 
+from ..utils import logger
 from .cell import Cell
 
 type T = Generic[T]
@@ -26,21 +27,18 @@ class Sightline:
     def open(self) -> Iterator[Cell]:
         return mi.flatten([self.row.open, self.col.open, self.house.open])
 
-    @open.setter
-    def open(self) -> Iterator[Cell]:
-        self._open = mi.flatten([self.row.open, self.col.open, self.house.open])
-
     @property
     def solved(self) -> Iterator[Cell]:
         return mi.flatten([self.row.open, self.col.open, self.house.open])
 
-    @solved.setter
-    def solved(self) -> Iterator[Cell]:
-        self._solved = mi.flatten([self.row.open, self.col.open, self.house.open])
-
-    def propogate(self, ans: int) -> None:
-        for cell in self.open:
+    def propagate(self, ans: int) -> bool:
+        result = False
+        open = [c for c in self.open if len(c) > 1]
+        for cell in open:
+            logger.debug(f"Removing `{ans}` from Cell({cell.pos})")
             cell.pop(ans)
+
+        return result
 
 
 @dataclass
@@ -85,13 +83,11 @@ class Container[T](UserList):
 
         self._solved: bool = False
 
-        self.cache: dict[dict[str, list[Cell]]] = defaultdict(None, defaultdict(list))
-
         self._strong_links: list[StrongLink] = []
 
     @property
     def solved(self) -> bool:
-        return self._solved
+        return self.is_solved()
 
     @solved.setter
     def solved(self) -> bool:
@@ -172,21 +168,24 @@ class Container[T](UserList):
         return [cell for cell in self.cells if not cell.solved]
 
     def get_counts(self) -> Counter:
-        return Counter(it.chain.from_iterable(cell.can for cell in self._open))
+        return Counter(it.chain.from_iterable(cell.can for cell in self.open))
 
     def get_strong_links(self) -> list[StrongLink]:
         for k, v in self.get_counts().items():
             if v != 2:
                 continue
             pairs: list[Cell] = []
-            for cell in self._open:
+            for cell in self.open:
                 if k in cell:
                     pairs.append(cell)
             if len(pairs) != 2:
                 continue
 
             s_link = StrongLink(link=k, cell_1=pairs[0], cell_2=pairs[1])
+            pairs[0].strong_links.add(pairs[1])
+            pairs[1].strong_links.add(pairs[0])
             self._strong_links.append(s_link)
+
         return self._strong_links
 
     def group_by_house(self) -> dict[int, list[Cell]]:

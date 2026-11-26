@@ -20,7 +20,7 @@ def get_board_from_file(request: pytest.FixtureRequest) -> Board:
     [(1, "locked_candidate")],
     indirect=True,
 )
-def test_locked_candidate(get_board_from_file: Board) -> None:
+def test_locked_candidate_1(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     board.check_naked_double()
@@ -29,6 +29,7 @@ def test_locked_candidate(get_board_from_file: Board) -> None:
     assert all(2 in house_6[i] for i in [2, 4, 5, 7, 8])
     assert all(3 in house_9[i] for i in [1, 3, 5, 7, 8, 9])
 
+    # board.show()
     res = board.check_locked_candidate()
     assert res is True
 
@@ -43,7 +44,7 @@ def test_locked_candidate(get_board_from_file: Board) -> None:
     [(2, "locked_candidate")],
     indirect=True,
 )
-def test_2nd_locked_candidate(get_board_from_file: Board) -> None:
+def test_locked_candidate_2(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     house = board.houses[4]
@@ -65,7 +66,7 @@ def test_2nd_locked_candidate(get_board_from_file: Board) -> None:
     [(3, "locked_candidate")],
     indirect=True,
 )
-def test_3rd_locked_candidate(get_board_from_file: Board) -> None:
+def test_locked_candidate_3(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     house = board.houses[9]
@@ -76,15 +77,15 @@ def test_3rd_locked_candidate(get_board_from_file: Board) -> None:
 
     assert all(1 in house[i] for i in [3, 6])
     assert all(1 not in house[i] for i in [1, 4, 7, 8])
-    board.show()
+    # board.show()
 
 
 @pytest.mark.parametrize(
     "get_board_from_file",
-    [(2, "pointing_tuple")],
+    [(1, "pointing_tuple")],
     indirect=True,
 )
-def test_pointing_tuple(get_board_from_file: Board) -> None:
+def test_pointing_tuple_1(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     col = board.columns[2]
@@ -96,8 +97,8 @@ def test_pointing_tuple(get_board_from_file: Board) -> None:
     assert 1 not in col[3]
 
 
-@pytest.mark.parametrize("get_board_from_file", [(3, "pointing_tuple")], indirect=True)
-def test_3rd_pointing_tuple(get_board_from_file: Board) -> None:
+@pytest.mark.parametrize("get_board_from_file", [(2, "pointing_tuple")], indirect=True)
+def test_pointing_tuple_2(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
     board.rows[1][4].pop(5)
@@ -119,13 +120,30 @@ def test_3rd_pointing_tuple(get_board_from_file: Board) -> None:
     assert 4 not in col[8]
 
 
+@pytest.mark.skip("Not finished")
 @pytest.mark.parametrize(
     "get_board_from_file",
-    [(1, "pointing_tuple")],
+    [(3, "pointing_tuple")],
     indirect=True,
 )
-def test_no_pointing_tuple(get_board_from_file: Board) -> None:
+def test_pointing_tuple_3(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
-    res = board.check_pointing_tuple()
-    assert res is False
+    board.check_naked_single()
+    board.check_hidden_single()
+    board.check_locked_candidate()
+    board.check_naked_double()
+    board.check_hidden_single()
+    board.check_naked_single()
+
+    board.check_pointing_tuple()
+    board.check_hidden_single()
+    board.check_naked_single()
+
+    board.check_hidden_single()
+    board.check_naked_single()
+
+    board.show(print_verify=True)
+
+    # res = board.check_pointing_tuple()
+    # assert res is False

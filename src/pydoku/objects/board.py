@@ -83,6 +83,7 @@ class Board:
         )
 
         self._phistomefel_ring: PhistomefelRing = None
+        self._bivals: set[Cell] = set()
 
     @property
     def open(self) -> Iterable[Container]:
@@ -95,6 +96,12 @@ class Board:
     @property
     def phistomefel_ring(self) -> PhistomefelRing:
         return self._set_phistomefel_ring()
+
+    @property
+    def bivals(self) -> list[Cell]:
+        return sorted(
+            self._get_all_bival_cells(), key=lambda c: (c.row, c.col, c.house)
+        )
 
     def set_puzzle(self, puzzle_path: str, level: str, num: int) -> None:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
@@ -192,6 +199,16 @@ class Board:
         for cell in self.cells:
             cell.sightline = self.get_cell_sightline(cell)
 
+    def _get_all_bival_cells(self) -> list[Cell]:
+        for con in self.open:
+            con.get_strong_links()
+
+        for c in self.index.values():
+            if c.bival and not c.solved:
+                self._bivals.add(c)
+
+        return self._bivals
+
     @singledispatchmethod
     def evaluate_result(self, _: NoOp) -> None:
         pass
@@ -199,30 +216,29 @@ class Board:
     @evaluate_result.register(Solved)
     def _(self, result: Solved) -> None:
         logger.debug(
-            f"Setting solution `{result.cell.solution}` in Cell{result.cell.pos}"
+            f"Setting solution `{result.cell.solution}` in Cell({result.cell.pos})",
         )
-        result.cell.sightline.propogate(result.cell.solution)
+        if result.cell.sightline.propagate(result.cell.solution):
+            self.check_hidden_single()
+            self.check_naked_single()
 
     @evaluate_result.register(Excluded)
     def _(self, result: Excluded) -> None:
         for cell, num in it.product(result.cells, result.to_exclude):
-            logger.debug(f"Removing `{num}` from Cell{cell.pos}")
+            logger.debug(f"Removing `{num}` from Cell({cell.pos})")
             cell.pop(num)
 
     def verify(self) -> bool:
         return all(
-            [
-                (con.solved for con in self.containers),
-                self.phistomefel_ring.compare() is True,
-            ]
+            [(con.solved for con in self.containers), self.phistomefel_ring.compare()]
         )
 
-    def show(self, verify: bool = False, *, print_verify: bool = False) -> None:
-        if verify:
-            print(self.verify())
-
+    def show(self, verify: bool = True, *, print_verify: bool = False) -> None:
         if print_verify:
             display_verify(self)
+
+        if verify:
+            print(self.verify())
 
         display_board(self)
 
@@ -241,6 +257,7 @@ class Board:
         result: bool = False
         for container in self.open:
             for hs in HiddenSingle(container):
+                hs: Solved
                 self.evaluate_result(hs)
                 if not isinstance(hs, NoOp):
                     result = True
@@ -254,6 +271,7 @@ class Board:
             if len(container.open) < 4:
                 continue
             for nd in NakedDouble(container):
+                nd: Excluded
                 self.evaluate_result(nd)
                 if not isinstance(nd, NoOp):
                     logger.debug(f"Excluding ND {nd.to_exclude} from Cells({nd.cells})")
@@ -268,6 +286,7 @@ class Board:
             if len(container.open) < 4:
                 continue
             for hd in HiddenDouble(container):
+                hd: Excluded
                 self.evaluate_result(hd)
                 if not isinstance(hd, NoOp):
                     logger.debug(f"Excluding HD {hd.to_exclude} from Cells({hd.cells})")
@@ -282,6 +301,7 @@ class Board:
             if len(container.open) <= 4:
                 continue
             for nt in NakedTriple(container):
+                nt: Excluded
                 self.evaluate_result(nt)
                 if not isinstance(nt, NoOp):
                     logger.debug(f"Excluding NT {nt.to_exclude} from Cells({nt.cells})")
@@ -296,6 +316,7 @@ class Board:
             if len(container.open) <= 5:
                 continue
             for ht in HiddenTriple(container):
+                ht: Excluded
                 self.evaluate_result(ht)
                 if not isinstance(ht, NoOp):
                     logger.debug(f"Excluding HT {ht.to_exclude} from Cells({ht.cells})")
@@ -314,6 +335,7 @@ class Board:
                 if not self.rows[i].solved and len(self.rows[i]) >= 3
             ]
             for pt in PointingTuple(house, rows):
+                pt: Excluded
                 self.evaluate_result(pt)
                 if not isinstance(pt, NoOp):
                     logger.debug(f"Excluding PT {pt.to_exclude} from Cells({pt.cells})")
@@ -325,6 +347,7 @@ class Board:
                 if not self.columns[i].solved and len(self.columns[i]) >= 3
             ]
             for pt in PointingTuple(house, cols):
+                pt: Excluded
                 self.evaluate_result(pt)
                 if not isinstance(pt, NoOp):
                     logger.debug(f"Excluding PT {pt.to_exclude} from Cells({pt.cells})")
@@ -335,29 +358,15 @@ class Board:
     def check_locked_candidate(self) -> bool:
         result: bool = False
 
-        houses: list[House] = [house for house in self.houses if not house.solved]
-        for house in houses:
-            rows = [
-                self.rows[i]
-                for i in house.row_intersections
-                if not self.rows[i].solved and len(self.rows[i]) >= 3
-            ]
-            for lc in LockedCandidate(house, rows):
-                self.evaluate_result(lc)
-                if not isinstance(lc, NoOp):
-                    logger.debug(f"Excluding LC {lc.to_exclude} from Cells({lc.cells})")
-                    result = True
-
-            cols = [
-                self.columns[i]
-                for i in house.col_intersections
-                if not self.columns[i].solved and len(self.columns[i]) >= 3
-            ]
-            for lc in LockedCandidate(house, cols):
-                self.evaluate_result(lc)
-                if not isinstance(lc, NoOp):
-                    logger.debug(f"Excluding LC {lc.to_exclude} from Cells({lc.cells})")
-                    result = True
+        containers = self.rows.open + self.columns.open
+        for lc in LockedCandidate(containers, self.houses):
+            lc: Excluded
+            self.evaluate_result(lc)
+            if not isinstance(lc, NoOp):
+                logger.debug(
+                    f"Excluding LC {lc.to_exclude} from Cells({'\n'.join(repr(c) for c in lc.cells)})"
+                )
+                result = True
 
         return result
 
@@ -368,15 +377,31 @@ class Board:
         cols: list[Column] = [col for col in self.columns if not col.solved]
 
         for xw in XWing(rows, "row"):
+            xw: Excluded
             self.evaluate_result(xw)
             if not isinstance(xw, NoOp):
                 logger.debug(f"Excluding XW {xw.to_exclude} from Cells({xw.cells})")
                 result = True
 
         for xw in XWing(cols, "col"):
+            xw: Excluded
             self.evaluate_result(xw)
             if not isinstance(xw, NoOp):
                 logger.debug(f"Excluding XW {xw.to_exclude} from Cells({xw.cells})")
+                result = True
+
+        return result
+
+    def check_y_wing(self) -> bool:
+        result = False
+
+        for yw in YWing(
+            self.rows.open, self.columns.open, self.houses.open, self.bivals
+        ):
+            yw: Excluded
+            self.evaluate_result(yw)
+            if not isinstance(yw, NoOp):
+                logger.debug(f"Excluding YW {yw.to_exclude} from Cells({yw.cells})")
                 result = True
 
         return result

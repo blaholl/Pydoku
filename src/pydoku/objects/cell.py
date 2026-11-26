@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from functools import singledispatchmethod
 from typing import TYPE_CHECKING
 
-from ..utils import EmptyCellError, IllegalAnswerError
+from ..utils import EmptyCellError, IllegalAnswerError, logger
 
 if TYPE_CHECKING:
     from .containers import Sightline
@@ -17,6 +17,9 @@ class Loc:
 
     def __eq__(self, other: tuple[int]) -> bool:
         return (self.r, self.c, self.h) == other
+
+    def __str__(self) -> str:
+        return f"r={self.r}, c={self.c}, h={self.h}"
 
 
 class Cell:
@@ -43,6 +46,7 @@ class Cell:
         self._bival: bool = len(self._can) == 2
 
         self.sightline: Sightline = None
+        self.strong_links: set[Cell] = set()
 
     @property
     def exc(self) -> list[int]:
@@ -83,9 +87,9 @@ class Cell:
         elif self.solved:
             return f"{base}, solved={self.solved}, solution={self.solution})"
         elif self.bival:
-            return f"{base}, bival={self.bival})"
+            return f"{base}, strong_links={self.strong_links}, bival={self.bival})"
         else:
-            return f"{base})"
+            return f"{base}, strong_links={self.strong_links})"
 
     def __str__(self) -> str:
         if self.solved:
@@ -107,6 +111,7 @@ class Cell:
     @singledispatchmethod
     def pop(self, can: int) -> None:
         if not self._can:
+            logger.critical(EmptyCellError(f"Cell {self.pos!r} is empty"))
             raise EmptyCellError(f"Cell {self.pos!r} is empty")
 
         if can in self._can:
@@ -117,6 +122,7 @@ class Cell:
     def _(self, can: Iterable[int]) -> None:
         for c in can:
             if not self._can:
+                logger.critical(EmptyCellError(f"Cell {self.pos!r} is empty"))
                 raise EmptyCellError(f"Cell {self.pos!r} is empty")
 
             if c in self._can:
@@ -144,6 +150,11 @@ class Cell:
             self._can = set()
             self._exc = set()
         else:
+            logger.critical(
+                IllegalAnswerError(
+                    f"{answer} is in Cell({self.pos!s})'s exclusion list"
+                )
+            )
             raise IllegalAnswerError(
                 f"{answer} is in Cell({self.pos!s})'s exclusion list"
             )

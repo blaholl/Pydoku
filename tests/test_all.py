@@ -5,13 +5,16 @@ import pytest
 
 from pydoku.objects import Board
 from pydoku.solver import Solver
+from pydoku.utils import logger
 
 """
 Beginner - 100/100 Passed
 Advanced - 100/100 Passed
-Expert   - 97/100 Passed -> 18, 30, 56, 75
+Expert   - 99/100 Passed -> 30
 Pro      - 4/100 Passed
 """
+
+logger.setLevel("ERROR")
 
 
 @pytest.skip("Large tests - skipping in bulk tests", allow_module_level=True)
@@ -66,7 +69,7 @@ def test_expert_puzzles(get_boards_from_file: Board) -> None:
     assert board.verify() is True
 
 
-@pytest.mark.skip("not yet implemented")
+# @pytest.mark.skip("not yet implemented")
 @pytest.mark.parametrize(
     "get_boards_from_file", [(i, "pro") for i in range(1, 101)], indirect=True
 )

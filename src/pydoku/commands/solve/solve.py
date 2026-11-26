@@ -48,16 +48,19 @@ PUZZLES: Path = Path("./tests/data/puzzles.json")
     default=3,
     help="Number of rounds to run the parser.",
 )
+@click.option("-v", "--print-verify", type=click.BOOL, default=True)
 @click.option(
     "--log-level",
     default=LogLevel.INFO,
     type=click.Choice(LogLevel, case_sensitive=False),
 )
-def solve(level: Level, puzzle: int, rounds: int, log_level: str) -> list[list[int]]:
+def solve(
+    level: Level, puzzle: int, rounds: int, log_level: str, print_verify: bool
+) -> list[list[int]]:
     logger.setLevel(log_level.upper())
     solver: Solver = Solver.open(PUZZLES, level, puzzle)
     board = solver.board
     res = solver.solve(rounds)
 
     click.echo(res)
-    click.echo(board.show())
+    click.echo(board.show(print_verify=print_verify))

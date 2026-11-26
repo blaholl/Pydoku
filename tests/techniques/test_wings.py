@@ -189,3 +189,64 @@ def test_x_wing_6(get_board_from_file: Board) -> None:
             (target not in col_2[i] for i in [8]),
         ]
     )
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
+    [(1, "y_wing")],
+    indirect=True,
+)
+def test_y_wing_1(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+    print()
+
+    assert 6 in board.rows[9][6]
+
+    # res = board.check_y_wing()
+    # print(res)
+
+    print("\n".join(f"{c.pos} - {len(c.strong_links)}" for c in board.bivals))
+
+    # assert 6 not in board.rows[9][6]
+
+    board.show()
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
+    [(2, "y_wing")],
+    indirect=True,
+)
+def test_y_wing_2(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+    board.show()
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
+    [(3, "y_wing")],
+    indirect=True,
+)
+def test_y_wing_3(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+    board.show()
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
+    [(4, "y_wing")],
+    indirect=True,
+)
+def test_y_wing_4(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+    board.show()
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
+    [(5, "y_wing")],
+    indirect=True,
+)
+def test_y_wing_5(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+    board.show()

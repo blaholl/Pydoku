@@ -1,5 +1,14 @@
 = Pydoku
 
+== 0.0.3 (2026-11-)
+
+=== Added
+* 
+
+=== Fixed
+* Fixed bugs in `PointedTuple` and `LockedCandidate` techniques.
+* Fixed bug in `Sightline.propagate()` to properly handle answer propagation.
+
 == 0.0.2 (2026-11-26)
 
 === Added

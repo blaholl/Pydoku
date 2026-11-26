@@ -184,3 +184,16 @@ def test_verify_board(get_board_from_file: Board) -> None:
     board.populate()
 
     assert board.verify() is False
+
+
+def test_bival_cells(get_board_from_file: Board) -> None:
+    file_path: Path = Path("./tests/data/puzzles.json")
+    level = "expert"
+    puz = 2
+
+    board: Board = Board.from_puzzle(puzzle_path=file_path, level=level, num=puz)
+    board: Board = get_board_from_file
+
+    board.populate()
+
+    assert all(len(c.can) == 2 and c.bival is True for c in board.bivals)

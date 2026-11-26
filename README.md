@@ -18,8 +18,9 @@ Options:
   -l, --level [beginner|advanced|expert|pro|impossible|extended]
                                   Level of the puzzle to retrieve.
   -p, --puzzle INTEGER            Number of the puzzle to retrieve under each
-                                  top-level "level" key.
+                                  level's top-level key.
   -r, --rounds INTEGER            Number of rounds to run the parser.
+  --log-level [debug|info|warning|error|critical]
   --help                          Show this message and exit.
 ```
 
@@ -33,7 +34,7 @@ Current results:
 | :---: | --- | ---: | ---: | ---: |
 | <ul><li>- [x] </li></ul> | Beginner | 100 | 100 | 100% |
 | <ul><li>- [x] </li></ul> | Advanced | 100 | 100 | 100% |
-| <ul><li>- [ ] </li></ul> | Expert | 95 | 100 | 95% |
+| <ul><li>- [ ] </li></ul> | Expert | 99 | 100 | 99% |
 | <ul><li>- [ ] </li></ul> | Pro | 4 | 100 | 4% |
 | <ul><li>- [ ] </li></ul> | Impossible 1 (Core) | - | 30 | - |
 | <ul><li>- [ ] </li></ul> | Impossible 2 (Extended) | - | - | - |
@@ -72,11 +73,9 @@ Current results:
 <details>
 <summary>View</summary>
 
-* [ ] Define Expert Techniques (3)
+* [ ] Define Pro techniques (4)
   * [ ] Naked Quaruple
   * [ ] Y Wing
-  * [ ] Avoidable Rectangle
-* [ ] Define Pro techniques (2)
   * [ ] Avoidable Rectangle
   * [ ] XYZ Wing
 * [ ] Define Impossible 1 (Core) techniques (13)

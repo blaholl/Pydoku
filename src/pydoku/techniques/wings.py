@@ -10,7 +10,7 @@ from .technique import Technique
 
 if TYPE_CHECKING:
     from ..objects import Cell
-    from ..objects.containers import Container, StrongLink
+    from ..objects.containers import Columns, Container, Houses, Rows, StrongLink
 
 
 class XWing(Technique):
@@ -58,3 +58,23 @@ class XWing(Technique):
             yield Excluded(exclusions, to_exclude)
 
         yield NoOp()
+
+
+class YWing(Technique):
+    def __init__(
+        self,
+        rows: Rows,
+        columns: Columns,
+        houses: Houses,
+        bivals: list[Cell],
+    ) -> None:
+        super().__init__([rows, columns, houses])
+        # self.containers = containers
+        self.rows = rows
+        self.columns = columns
+        self.hosues = houses
+        self.bivals = bivals
+
+    def __call__(self) -> Generator[Result]:
+        for b in self.bivals:
+            yield NoOp()

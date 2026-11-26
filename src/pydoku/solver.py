@@ -22,7 +22,10 @@ class Solver:
         return cls(board)
 
     def cleanup(self) -> None:
-        if self.board.check_naked_single() or self.board.check_hidden_single():
+        if self.board.check_naked_single():
+            self.cleanup()
+
+        if self.board.check_hidden_single():
             self.cleanup()
 
     def solve(self, rounds: int = 3) -> None:
@@ -33,7 +36,10 @@ class Solver:
                 solved = True
                 break
 
-            self.run()
+            res = self.run()
+            if res is True:
+                solved = True
+                break
 
             if round >= rounds:
                 break
@@ -51,7 +57,12 @@ class Solver:
             self.board.check_naked_double()
             self.cleanup()
 
-        if self.board.check_locked_candidate() or self.board.check_pointing_tuple():
+        if self.board.check_locked_candidate():
+            self.board.check_hidden_double()
+            self.board.check_naked_double()
+            self.cleanup()
+
+        if self.board.check_pointing_tuple():
             self.board.check_hidden_double()
             self.board.check_naked_double()
             self.cleanup()
@@ -61,3 +72,11 @@ class Solver:
 
         if self.board.check_hidden_triple():
             self.cleanup()
+
+        if self.board.check_x_wing():
+            self.cleanup()
+
+    def mid_1(self) -> bool:
+        techniques = [self.board.check_hidden_triple()]
+
+        return any(techniques)
