@@ -12,3 +12,5 @@ from .result import (
 )
 
 from .cli import cli as cli
+
+from .logger import logger as logger

@@ -8,6 +8,7 @@ from .triples import HiddenTriple as HiddenTriple
 from .triples import NakedTriple as NakedTriple
 from .tuples import LockedCandidate as LockedCandidate
 from .tuples import PointingTuple as PointingTuple
+from .wings import XWing as XWing
 
 __all__ = [
     "HiddenDouble",
@@ -20,4 +21,5 @@ __all__ = [
     "NakedSingle",
     "NakedTriple",
     "PointingTuple",
+    "XWing",
 ]

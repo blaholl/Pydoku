@@ -66,6 +66,9 @@ class StrongLink:
     def __hash__(self) -> int:
         return hash(self)
 
+    def get_cells(self) -> tuple[Cell, Cell]:
+        return self.cell_1, self.cell_2
+
 
 class Container[T](UserList):
     def __init__(self, idx: int, cells: Iterable[Cell]) -> None:
@@ -312,3 +315,63 @@ class PhistomefelRing:
                 diffs[k] = v - self.inner_count[k]
 
         return diffs
+
+
+@dataclass
+class NumCounts:
+    total: int
+    open: int
+    closed: int
+    rows: int
+    cols: int
+    houses: int
+
+
+class Number:
+    def __init__(self, value: int) -> None:
+        self.value = value
+        self._open: list[Cell] = []
+        self._closed: list[Cell] = []
+        self._solved: bool = False
+        self._counts: NumCounts = None
+        self._strong_links: list[StrongLink] = []
+        self._doubles: list[Container]
+
+    @property
+    def open(self) -> list[Cell]:
+        return self._open
+
+    @open.setter
+    def open(self, containers: list[Container]) -> None:
+        for con in containers:
+            for c in con:
+                if not c.solved and self.value in c:
+                    self._open.append(c)
+
+    @property
+    def closed(self) -> list[Cell]:
+        return self._closed
+
+    @closed.setter
+    def closed(self, containers: list[Container]) -> None:
+        for con in containers:
+            for c in con:
+                if c.solved and self.value == c.solution:
+                    self._closed.append(c)
+
+    @property
+    def solved(self) -> bool:
+        return len(self.closed) == 9
+
+    @property
+    def strong_links(self) -> list[StrongLink]:
+        return self._strong_links
+
+    @strong_links.setter
+    def strong_links(self, containers: list[Container]) -> None:
+        for con in containers:
+            if not con.strong_links:
+                continue
+            for sl in con.strong_links:
+                if self.value == sl.link:
+                    self._strong_links.append(sl)

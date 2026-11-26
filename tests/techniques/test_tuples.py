@@ -62,6 +62,25 @@ def test_2nd_locked_candidate(get_board_from_file: Board) -> None:
 
 @pytest.mark.parametrize(
     "get_board_from_file",
+    [(3, "locked_candidate")],
+    indirect=True,
+)
+def test_3rd_locked_candidate(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+
+    house = board.houses[9]
+    assert all(1 in house[i] for i in [1, 3, 4, 6, 7, 8])
+
+    res = board.check_locked_candidate()
+    assert res is True
+
+    assert all(1 in house[i] for i in [3, 6])
+    assert all(1 not in house[i] for i in [1, 4, 7, 8])
+    board.show()
+
+
+@pytest.mark.parametrize(
+    "get_board_from_file",
     [(2, "pointing_tuple")],
     indirect=True,
 )
