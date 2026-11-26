@@ -5,6 +5,7 @@ import more_itertools as mi
 
 if TYPE_CHECKING:
     from ..objects import Cell
+    from ..objects.containers import StrongLink
 
 
 class Policy:
@@ -47,3 +48,32 @@ class Policy:
         if k not in counts:
             return
         return v >= 3 and v >= counts.get(k)
+
+    @staticmethod
+    def is_x_wing_candidate(
+        link_1: StrongLink, link_2: StrongLink, container_type: str
+    ) -> bool:
+        l_cell_1, l_cell_2 = link_1.get_cells()
+        r_cell_1, r_cell_2 = link_2.get_cells()
+
+        match container_type:
+            case "row":
+                con_1, con_2 = (
+                    (l_cell_1.col, r_cell_1.col),
+                    (l_cell_2.col, r_cell_2.col),
+                )
+            case "col":
+                con_1, con_2 = (
+                    (l_cell_1.row, r_cell_1.row),
+                    (l_cell_2.row, r_cell_2.row),
+                )
+
+        return all(
+            [
+                mi.all_equal(con_1),
+                mi.all_equal(con_2),
+                mi.all_unique(
+                    [l_cell_1.house, l_cell_2.house, r_cell_1.house, r_cell_2.house]
+                ),
+            ]
+        )

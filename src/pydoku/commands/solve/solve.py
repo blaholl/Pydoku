@@ -5,6 +5,8 @@ import click
 
 from pydoku.solver import Solver
 
+from ...utils.logger import logger
+
 
 class Level(StrEnum):
     BEGINNER = "beginner"
@@ -13,6 +15,14 @@ class Level(StrEnum):
     PRO = "pro"
     IMPOSSIBLE = "impossible"
     EXTENDED = "extended"
+
+
+class LogLevel(StrEnum):
+    DEBUG = "debug"
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
 
 
 PUZZLES: Path = Path("./tests/data/puzzles.json")
@@ -38,7 +48,13 @@ PUZZLES: Path = Path("./tests/data/puzzles.json")
     default=3,
     help="Number of rounds to run the parser.",
 )
-def solve(level: Level, puzzle: int, rounds: int) -> list[list[int]]:
+@click.option(
+    "--log-level",
+    default=LogLevel.INFO,
+    type=click.Choice(LogLevel, case_sensitive=False),
+)
+def solve(level: Level, puzzle: int, rounds: int, log_level: str) -> list[list[int]]:
+    logger.setLevel(log_level.upper())
     solver: Solver = Solver.open(PUZZLES, level, puzzle)
     board = solver.board
     res = solver.solve(rounds)

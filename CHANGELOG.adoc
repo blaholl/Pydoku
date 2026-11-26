@@ -1,0 +1,9 @@
+= Pydoku
+
+== 0.0.2 (2026-11-26)
+
+=== Added
+* Added X-Wing technique and tests.
+* Added basic logging to technique funtions in `board.py` for debugging.
+* Added more test puzzles for specific techniques.
+* Created CHANGELOG.adoc.

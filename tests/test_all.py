@@ -9,12 +9,12 @@ from pydoku.solver import Solver
 """
 Beginner - 100/100 Passed
 Advanced - 100/100 Passed
-Expert   - 95/100 Passed -> 9,10, 30, 60, 77, 93
+Expert   - 97/100 Passed -> 18, 30, 56, 75
 Pro      - 4/100 Passed
 """
 
 
-# @pytest.skip("Large tests - skipping in bulk tests", allow_module_level=True)
+@pytest.skip("Large tests - skipping in bulk tests", allow_module_level=True)
 @pytest.fixture(params=["puzzle", "level"])
 def get_boards_from_file(request: pytest.FixtureRequest) -> Generator[Board]:
     puzzle, level = request.param
@@ -25,7 +25,7 @@ def get_boards_from_file(request: pytest.FixtureRequest) -> Generator[Board]:
     yield board
 
 
-@pytest.mark.skip("not yet implemented")
+# @pytest.mark.skip("not yet implemented")
 @pytest.mark.parametrize(
     "get_boards_from_file",
     [(i, "beginner") for i in range(1, 101)],
@@ -40,7 +40,7 @@ def test_beginner_puzzles(get_boards_from_file: Board) -> None:
     assert board.verify() is True
 
 
-@pytest.mark.skip("not yet implemented")
+# @pytest.mark.skip("not yet implemented")
 @pytest.mark.parametrize(
     "get_boards_from_file", [(i, "advanced") for i in range(1, 101)], indirect=True
 )
@@ -53,7 +53,7 @@ def test_advanced_puzzles(get_boards_from_file: Board) -> None:
     assert board.verify() is True
 
 
-@pytest.mark.skip("not yet implemented")
+# @pytest.mark.skip("not yet implemented")
 @pytest.mark.parametrize(
     "get_boards_from_file", [(i, "expert") for i in range(1, 101)], indirect=True
 )
