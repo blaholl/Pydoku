@@ -137,7 +137,20 @@ def test_x_wing_4(get_board_from_file: Board) -> None:
 def test_x_wing_5(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
-    board.show()
+    row_1 = board.rows[1]
+    row_2 = board.rows[7]
+    x = [3, 8]
+    assert all([(2 in row_1[i] for i in x), (2 in row_2[i] for i in x)])
+
+    col_1 = board.columns[3]
+    col_2 = board.columns[8]
+    assert all([(2 in col_1[i] for i in x + [3, 8]), (2 in col_2[i] for i in x)])
+
+    res = board.check_x_wing()
+    assert res is True
+
+    assert all([(2 in row_1[i] for i in x), (2 in row_2[i] for i in x)])
+    assert all(2 not in col_1[i] for i in [3, 8])
 
 
 @pytest.mark.parametrize(
@@ -148,4 +161,31 @@ def test_x_wing_5(get_board_from_file: Board) -> None:
 def test_x_wing_6(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
-    board.show()
+    board.check_hidden_double()
+    board.check_pointing_tuple()
+
+    row_1 = board.rows[2]
+    row_2 = board.rows[9]
+    target = 7
+    x = [5, 8]
+    assert all([(target in row_1[i] for i in x), (target in row_2[i] for i in x)])
+
+    col_1 = board.columns[5]
+    col_2 = board.columns[8]
+    assert all(
+        [
+            (target in col_1[i] for i in x + [3, 8]),
+            (target in col_2[i] for i in x + [8]),
+        ]
+    )
+
+    res = board.check_x_wing()
+    assert res is True
+
+    assert all([(target in row_1[i] for i in x), (target in row_2[i] for i in x)])
+    assert all(
+        [
+            (target not in col_1[i] for i in [3, 8]),
+            (target not in col_2[i] for i in [8]),
+        ]
+    )

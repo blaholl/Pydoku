@@ -41,7 +41,7 @@ Current results:
 
 ## Implemented Techniques
 
-| 9 / 45 (20%) |
+| 10 / 45 (202.22%) |
 |-|
 
 <details>
@@ -56,6 +56,7 @@ Current results:
 * Hidden Pair
 * Naked Triple
 * Hidden Triple
+* X-Wing
 </details>
 
 ## TODO
@@ -71,8 +72,6 @@ Current results:
 <details>
 <summary>View</summary>
 
-* [ ] Define Advanced Techniques (1)
-  * [ ] X-Wing
 * [ ] Define Expert Techniques (3)
   * [ ] Naked Quaruple
   * [ ] Y Wing
