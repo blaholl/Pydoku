@@ -72,8 +72,8 @@ class Policy:
             [
                 mi.all_equal(con_1),
                 mi.all_equal(con_2),
-                mi.all_unique(
-                    [l_cell_1.house, l_cell_2.house, r_cell_1.house, r_cell_2.house]
-                ),
+                # mi.all_unique(
+                #     [l_cell_1.house, l_cell_2.house, r_cell_1.house, r_cell_2.house]
+                # ),
             ]
         )

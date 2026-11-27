@@ -6,7 +6,7 @@ from typing import Generic
 
 import more_itertools as mi
 
-from ..utils import logger
+from ..utils import set_log
 from .cell import Cell
 
 type T = Generic[T]
@@ -35,7 +35,7 @@ class Sightline:
         result = False
         open = [c for c in self.open if len(c) > 1]
         for cell in open:
-            logger.debug(f"Removing `{ans}` from Cell({cell.pos})")
+            set_log(msg=f"Removing `{ans}` from Cell({cell.pos})", fn="propagate")
             cell.pop(ans)
 
         return result

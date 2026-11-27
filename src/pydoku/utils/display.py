@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.table import Table
+from terminaltexteffects.effects.effect_burn import Burn
 
 if TYPE_CHECKING:
     from ..objects import Board
@@ -31,14 +32,41 @@ def display_verify(board: Board) -> None:
     Args:
         board (Board): The current :class:`Board` object.
     """
-    print("Rows:")
-    for row in board.rows:
-        print(f"Row {row.idx} -> {row.is_solved()}")
+    # print("Rows:")
+    # for row in board.rows:
+    #     print(f"Row {row.idx} -> {row.is_solved()}")
 
-    print("Columns:")
-    for col in board.columns:
-        print(f"Column {col.idx} -> {col.is_solved()}")
+    # print("Columns:")
+    # for col in board.columns:
+    #     print(f"Column {col.idx} -> {col.is_solved()}")
 
-    print("Houses:")
-    for house in board.houses:
-        print(f"House {house.idx} -> {house.is_solved()}")
+    # print("Houses:")
+    # for house in board.houses:
+    #     print(f"House {house.idx} -> {house.is_solved()}")
+
+    if board.verify():
+        row_out = "\n".join(
+            [f"Row {row.idx} -> {row.is_solved()}" for row in board.rows]
+        )
+        col_out = "\n".join(
+            [f"Column {col.idx} -> {col.is_solved()}" for col in board.columns]
+        )
+        house_out = "\n".join(
+            [f"House {house.idx} -> {house.is_solved()}" for house in board.houses]
+        )
+        effect = Burn(f"{row_out}\n{col_out}\n{house_out}")
+        with effect.terminal_output() as terminal:
+            for frame in effect:
+                terminal.print(frame)
+    else:
+        print("Rows:")
+        for row in board.rows:
+            print(f"Row {row.idx} -> {row.is_solved()}")
+
+        print("Columns:")
+        for col in board.columns:
+            print(f"Column {col.idx} -> {col.is_solved()}")
+
+        print("Houses:")
+        for house in board.houses:
+            print(f"House {house.idx} -> {house.is_solved()}")

@@ -27,6 +27,17 @@ def get_board_hd_from_file() -> Board:
     return board
 
 
+@pytest.fixture
+def get_board_hd_from_file_2() -> Board:
+    file_path: Path = Path("./tests/data/puzzles.json")
+    level = "expert"
+    puz = 30
+
+    board: Board = Board.from_puzzle(puzzle_path=file_path, level=level, num=puz)
+    board.populate()
+    return board
+
+
 def test_naked_double(get_board_from_file: Board) -> None:
     board: Board = get_board_from_file
 
@@ -93,6 +104,23 @@ def test_hidden_double(get_board_hd_from_file: Board) -> None:
     assert 8 not in board.index.get(53)
     assert 8 not in board.index.get(54)
 
+    # board.check_naked_single()
+    # board.check_hidden_single()
+    # board.check_naked_single()
+
+
+def test_hidden_double_2(get_board_hd_from_file_2: Board) -> None:
+    board: Board = get_board_hd_from_file_2
+
     board.check_naked_single()
     board.check_hidden_single()
+    board.check_locked_candidate()
     board.check_naked_single()
+    board.check_hidden_single()
+    board.check_pointing_tuple()
+    board.check_naked_single()
+    board.check_hidden_single()
+
+    res = board.check_hidden_double()
+    print(res)
+    board.show()

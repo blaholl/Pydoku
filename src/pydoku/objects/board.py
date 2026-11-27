@@ -1,4 +1,5 @@
 import itertools as it
+import logging
 from collections.abc import Iterable
 from functools import singledispatchmethod
 from pathlib import Path
@@ -8,7 +9,7 @@ from typing import Self
 import more_itertools as mi
 
 from ..techniques import *
-from ..utils import logger
+from ..utils import set_cells, set_excluded, set_log
 from ..utils.construct_board import construct_cells, load_puzzle, set_board
 from ..utils.display import display_board, display_verify
 from ..utils.result import Excluded, NoOp, Solved
@@ -84,6 +85,7 @@ class Board:
 
         self._phistomefel_ring: PhistomefelRing = None
         self._bivals: set[Cell] = set()
+        self._get_all_bival_cells()
 
     @property
     def open(self) -> Iterable[Container]:
@@ -209,14 +211,19 @@ class Board:
 
         return self._bivals
 
+    def gather_stats(self) -> None:
+        pass
+
     @singledispatchmethod
     def evaluate_result(self, _: NoOp) -> None:
         pass
 
     @evaluate_result.register(Solved)
     def _(self, result: Solved) -> None:
-        logger.debug(
-            f"Setting solution `{result.cell.solution}` in Cell({result.cell.pos})",
+        set_log(
+            msg=f"Setting solution `{result.cell.solution}` in Cell({result.cell.pos})",
+            level=logging.DEBUG,
+            fn="evaluate_result",
         )
         if result.cell.sightline.propagate(result.cell.solution):
             self.check_hidden_single()
@@ -225,7 +232,11 @@ class Board:
     @evaluate_result.register(Excluded)
     def _(self, result: Excluded) -> None:
         for cell, num in it.product(result.cells, result.to_exclude):
-            logger.debug(f"Removing `{num}` from Cell({cell.pos})")
+            set_log(
+                msg=f"Removing `{num}` from Cell({cell.pos})",
+                level=logging.DEBUG,
+                fn="evaluate_result",
+            )
             cell.pop(num)
 
     def verify(self) -> bool:
@@ -274,7 +285,11 @@ class Board:
                 nd: Excluded
                 self.evaluate_result(nd)
                 if not isinstance(nd, NoOp):
-                    logger.debug(f"Excluding ND {nd.to_exclude} from Cells({nd.cells})")
+                    set_log(
+                        msg=f"Excluded {set_excluded(nd.to_exclude)} from:{set_cells(nd.cells)}",
+                        level=logging.DEBUG,
+                        fn="check_naked_double",
+                    )
                     result = True
 
         return result
@@ -283,13 +298,17 @@ class Board:
         result: bool = False
 
         for container in self.open:
-            if len(container.open) < 4:
-                continue
+            # if len(container.open) < 4:
+            #     continue
             for hd in HiddenDouble(container):
                 hd: Excluded
                 self.evaluate_result(hd)
                 if not isinstance(hd, NoOp):
-                    logger.debug(f"Excluding HD {hd.to_exclude} from Cells({hd.cells})")
+                    set_log(
+                        msg=f"Excluded {set_excluded(hd.to_exclude)} from:{set_cells(hd.cells)}",
+                        level=logging.DEBUG,
+                        fn="check_hidden_double",
+                    )
                     result = True
 
         return result
@@ -304,7 +323,11 @@ class Board:
                 nt: Excluded
                 self.evaluate_result(nt)
                 if not isinstance(nt, NoOp):
-                    logger.debug(f"Excluding NT {nt.to_exclude} from Cells({nt.cells})")
+                    set_log(
+                        msg=f"Excluded {set_excluded(nt.to_exclude)} from:{set_cells(nt.cells)}",
+                        level=logging.DEBUG,
+                        fn="check_naked_triple",
+                    )
                     result = True
 
         return result
@@ -319,7 +342,11 @@ class Board:
                 ht: Excluded
                 self.evaluate_result(ht)
                 if not isinstance(ht, NoOp):
-                    logger.debug(f"Excluding HT {ht.to_exclude} from Cells({ht.cells})")
+                    set_log(
+                        msg=f"Excluded {set_excluded(ht.to_exclude)} from:{set_cells(ht.cells)}",
+                        level=logging.DEBUG,
+                        fn="check_hidden_triple",
+                    )
                     result = True
 
         return result
@@ -338,7 +365,11 @@ class Board:
                 pt: Excluded
                 self.evaluate_result(pt)
                 if not isinstance(pt, NoOp):
-                    logger.debug(f"Excluding PT {pt.to_exclude} from Cells({pt.cells})")
+                    set_log(
+                        msg=f"Excluded {set_excluded(pt.to_exclude)} from:{set_cells(pt.cells)}",
+                        level=logging.DEBUG,
+                        fn="check_pointing_tuple",
+                    )
                     result = True
 
             cols = [
@@ -350,7 +381,11 @@ class Board:
                 pt: Excluded
                 self.evaluate_result(pt)
                 if not isinstance(pt, NoOp):
-                    logger.debug(f"Excluding PT {pt.to_exclude} from Cells({pt.cells})")
+                    set_log(
+                        msg=f"Excluded {set_excluded(pt.to_exclude)} from:{set_cells(pt.cells)}",
+                        level=logging.DEBUG,
+                        fn="check_pointing_tuple",
+                    )
                     result = True
 
         return result
@@ -363,8 +398,10 @@ class Board:
             lc: Excluded
             self.evaluate_result(lc)
             if not isinstance(lc, NoOp):
-                logger.debug(
-                    f"Excluding LC {lc.to_exclude} from Cells({'\n'.join(repr(c) for c in lc.cells)})"
+                set_log(
+                    msg=f"Excluded {set_excluded(lc.to_exclude)} from:{set_cells(lc.cells)}",
+                    level=logging.DEBUG,
+                    fn="check_locked_candidate",
                 )
                 result = True
 
@@ -372,6 +409,7 @@ class Board:
 
     def check_x_wing(self) -> bool:
         result = False
+        self._get_all_bival_cells()
 
         rows: list[Row] = [row for row in self.rows if not row.solved]
         cols: list[Column] = [col for col in self.columns if not col.solved]
@@ -380,20 +418,29 @@ class Board:
             xw: Excluded
             self.evaluate_result(xw)
             if not isinstance(xw, NoOp):
-                logger.debug(f"Excluding XW {xw.to_exclude} from Cells({xw.cells})")
+                set_log(
+                    msg=f"Excluded {set_excluded(xw.to_exclude)} from:{set_cells(xw.cells)}",
+                    level=logging.DEBUG,
+                    fn="check_x_wing",
+                )
                 result = True
 
         for xw in XWing(cols, "col"):
             xw: Excluded
             self.evaluate_result(xw)
             if not isinstance(xw, NoOp):
-                logger.debug(f"Excluding XW {xw.to_exclude} from Cells({xw.cells})")
+                set_log(
+                    msg=f"Excluded {set_excluded(xw.to_exclude)} from:{set_cells(xw.cells)}",
+                    level=logging.DEBUG,
+                    fn="check_x_wing",
+                )
                 result = True
 
         return result
 
     def check_y_wing(self) -> bool:
         result = False
+        self._get_all_bival_cells()
 
         for yw in YWing(
             self.rows.open, self.columns.open, self.houses.open, self.bivals
@@ -401,7 +448,11 @@ class Board:
             yw: Excluded
             self.evaluate_result(yw)
             if not isinstance(yw, NoOp):
-                logger.debug(f"Excluding YW {yw.to_exclude} from Cells({yw.cells})")
+                set_log(
+                    sg=f"Excluded {set_excluded(yw.to_exclude)} from:{set_cells(yw.cells)}",
+                    level=logging.DEBUG,
+                    fn="check_y_wing",
+                )
                 result = True
 
         return result

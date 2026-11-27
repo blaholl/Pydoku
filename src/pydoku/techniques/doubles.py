@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import more_itertools as mi
 
 # from ..utils.policies import Policy
+from ..utils import set_excluded, set_log
 from ..utils.result import Excluded, NoOp, Result
 from .technique import Technique
 
@@ -53,39 +54,46 @@ class NakedDouble(Technique):
                 cell for cell in self.container.open if cell not in candidate_cells
             ]
 
+            set_log(
+                msg=f"{self.container.__class__.__name__} {self.container.idx} | {set_excluded(to_exclude)}",
+                fn="naked_double",
+            )
+
             yield Excluded(exclusion_cells, to_exclude)
 
 
-@cache
+# @cache
 class HiddenDouble(Technique):
     def __init__(self, container: Container) -> None:
         super().__init__(container)
         self.container = container
 
     def __call__(self) -> Generator[Result]:
-        counts: Counter = self.container.get_counts()
-        combis: list[tuple[int]] = sorted(
-            {
-                pair
-                for pair in it.combinations(
-                    it.chain.from_iterable(c.can for c in self.container.open), 2
-                )
-                if all([counts[pair[0]] == 2, counts[pair[1]] == 2])
-                and not mi.all_equal(pair)
-            }
-        )
+        counts: Counter = {
+            k: v for k, v in self.container.get_counts().items() if v == 2
+        }
+        if len(counts) < 2:
+            return NoOp()
+
+        combis: list[tuple[int]] = it.combinations(counts.keys(), 2)
+
         if not combis:
-            yield NoOp()
+            return NoOp()
 
         for combi in combis:
             candidate_cells: list[Cell] = [
                 c for c in self.container.open if set(combi) <= set(c.can)
             ]
-            if len(candidate_cells) != 2 or mi.all_equal(candidate_cells):
+            if len(candidate_cells) != 2:
                 continue
 
             to_exclude: set[int] = set(
                 mi.flatten(set(c.can) - set(combi) for c in candidate_cells)
+            )
+
+            set_log(
+                msg=f"{self.container.__class__.__name__} {self.container.idx} | {set_excluded(to_exclude)}",
+                fn="hidden_double",
             )
 
             yield Excluded(candidate_cells, to_exclude)

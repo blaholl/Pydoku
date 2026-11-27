@@ -1,9 +1,10 @@
+import logging
 from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import singledispatchmethod
 from typing import TYPE_CHECKING
 
-from ..utils import EmptyCellError, IllegalAnswerError, logger
+from ..utils import EmptyCellError, IllegalAnswerError, set_log
 
 if TYPE_CHECKING:
     from .containers import Sightline
@@ -89,7 +90,7 @@ class Cell:
         elif self.bival:
             return f"{base}, strong_links={self.strong_links}, bival={self.bival})"
         else:
-            return f"{base}, strong_links={self.strong_links})"
+            return f"{base})"
 
     def __str__(self) -> str:
         if self.solved:
@@ -111,7 +112,11 @@ class Cell:
     @singledispatchmethod
     def pop(self, can: int) -> None:
         if not self._can:
-            logger.critical(EmptyCellError(f"Cell {self.pos!r} is empty"))
+            set_log(
+                msg=f"EmptyCellError: Cell {self.pos!r} is empty",
+                level=logging.CRITICAL,
+                fn="pop",
+            )
             raise EmptyCellError(f"Cell {self.pos!r} is empty")
 
         if can in self._can:
@@ -122,7 +127,11 @@ class Cell:
     def _(self, can: Iterable[int]) -> None:
         for c in can:
             if not self._can:
-                logger.critical(EmptyCellError(f"Cell {self.pos!r} is empty"))
+                set_log(
+                    msg=f"EmptyCellError: Cell {self.pos!r} is empty",
+                    level=logging.CRITICAL,
+                    fn="pop",
+                )
                 raise EmptyCellError(f"Cell {self.pos!r} is empty")
 
             if c in self._can:
@@ -150,10 +159,10 @@ class Cell:
             self._can = set()
             self._exc = set()
         else:
-            logger.critical(
-                IllegalAnswerError(
-                    f"{answer} is in Cell({self.pos!s})'s exclusion list"
-                )
+            set_log(
+                msg=f"IllegalAnswerError: {answer} is in Cell({self.pos!s})'s exclusion list",
+                level=logging.CRITICAL,
+                fn="solve",
             )
             raise IllegalAnswerError(
                 f"{answer} is in Cell({self.pos!s})'s exclusion list"

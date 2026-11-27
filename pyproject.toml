@@ -18,6 +18,7 @@ dependencies = [
     "ruff>=0.17.2",
     "click>=8.5.0",
     "networkx>=3.7",
+    "terminaltexteffects>=0.15.0",
 ]
 
 [build-system]

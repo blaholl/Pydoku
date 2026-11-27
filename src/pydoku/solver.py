@@ -54,7 +54,7 @@ class Solver:
             self.cleanup()
 
         if self.board.check_hidden_double():
-            self.board.check_naked_double()
+            # self.board.check_naked_double()
             self.cleanup()
 
         if self.board.check_locked_candidate():
@@ -75,6 +75,12 @@ class Solver:
 
         if self.board.check_x_wing():
             self.cleanup()
+
+        if self.board.check_y_wing():
+            self.cleanup()
+
+        if self.board.verify():
+            return True
 
     def mid_1(self) -> bool:
         techniques = [self.board.check_hidden_triple()]

@@ -1,10 +1,11 @@
+import logging
 from collections.abc import Generator
 from typing import TYPE_CHECKING
 
 import more_itertools as mi
 
 from ..objects.containers import Column, Row
-from ..utils.logger import logger
+from ..utils.logger import set_excluded, set_log
 from ..utils.policies import Policy
 from ..utils.result import Excluded, NoOp, Result
 from .technique import Technique
@@ -47,12 +48,11 @@ class LockedCandidate(Technique):
                     c for c in house.open if c not in candidate_cells
                 ]
 
-                logger.debug("Locked Candidate")
-                logger.debug(f"{container.__class__.__name__} {container.idx}")
-                logger.debug(f"House {house.idx}")
-                logger.debug(to_exclude)
-                logger.debug(f"{'\n'.join(repr(c) for c in exclusion_cells)}")
-
+                set_log(
+                    level=logging.DEBUG,
+                    msg=f"{container.__class__.__name__} {container.idx} -> House {house.idx} | {set_excluded(to_exclude)}",
+                    fn="locked_candidate",
+                )
                 yield Excluded(cells=exclusion_cells, to_exclude=to_exclude)
 
             yield NoOp()
@@ -119,11 +119,10 @@ class PointingTuple(Technique):
                 if not exclusion_cells:
                     continue
 
-                logger.debug("Pointing tuple")
-                logger.debug(f"House {self.house.idx}")
-                logger.debug(f"{container.__class__.__name__} {container.idx}")
-                logger.debug(to_exclude)
-                logger.debug(f"{'\n'.join(repr(c) for c in exclusion_cells)}")
+                set_log(
+                    f"House {self.house.idx} -> {container.__class__.__name__} {container.idx} | {set_excluded(to_exclude)}",
+                    fn="pointing_tuple",
+                )
 
                 yield Excluded(exclusion_cells, to_exclude)
 

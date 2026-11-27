@@ -1,3 +1,7 @@
+                                     _____  __   __ ______   _____  _     _ _     _
+                                    |_____]   \_/   |     \ |     | |____/  |     |
+                                    |          |    |_____/ |_____| |    \_ |_____|
+
 # Pydoku Sudoku Solver
 
 [![CodeQL Advanced](https://github.com/blaholl/Pydoku/actions/workflows/codeql.yml/badge.svg)](https://github.com/blaholl/Pydoku/actions/workflows/codeql.yml)  [![Python application](https://github.com/blaholl/Pydoku/actions/workflows/python-app.yml/badge.svg)](https://github.com/blaholl/Pydoku/actions/workflows/python-app.yml)
@@ -74,7 +78,7 @@ Current results:
 <summary>View</summary>
 
 * [ ] Define Pro techniques (4)
-  * [ ] Naked Quaruple
+  * [ ] Naked Quadruple
   * [ ] Y Wing
   * [ ] Avoidable Rectangle
   * [ ] XYZ Wing
