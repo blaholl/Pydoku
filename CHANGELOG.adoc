@@ -3,11 +3,15 @@
 == 0.0.3 (2026-11-)
 
 === Added
-* 
+* Added logging abstractions.
+* Added Logging lines to various techniques.
+* Added TextEffects to certain successful output strings.
+* Added `Pydoku` logo.
 
 === Fixed
 * Fixed bugs in `PointedTuple` and `LockedCandidate` techniques.
 * Fixed bug in `Sightline.propagate()` to properly handle answer propagation.
+* Fixed bug in `HiddenDouble` technique.
 
 == 0.0.2 (2026-11-26)
 

@@ -57,7 +57,6 @@ def test_pop_int_from_cell(create_cell: Cell) -> None:
 
 def test_pop_empty_cell(create_cell: Cell) -> None:
     cell: Cell = create_cell
-    cell.can = set()
 
     with pytest.raises(EmptyCellError):
         cell.pop(2)
@@ -75,7 +74,6 @@ def test_pop_list_from_cell(create_cell: Cell) -> None:
 
 def test_pop_list_empty_cell(create_cell: Cell) -> None:
     cell: Cell = create_cell
-    cell.can = set()
 
     with pytest.raises(EmptyCellError):
         cell.pop([2, 5])

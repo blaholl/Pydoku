@@ -1,6 +1,6 @@
-                                     _____  __   __ ______   _____  _     _ _     _
-                                    |_____]   \_/   |     \ |     | |____/  |     |
-                                    |          |    |_____/ |_____| |    \_ |_____|
+                                 _____  __   __ ______   _____  _     _ _     _
+                                |_____]   \_/   |     \ |     | |____/  |     |
+                                |          |    |_____/ |_____| |    \_ |_____|
 
 # Pydoku Sudoku Solver
 
@@ -24,8 +24,10 @@ Options:
   -p, --puzzle INTEGER            Number of the puzzle to retrieve under each
                                   level's top-level key.
   -r, --rounds INTEGER            Number of rounds to run the parser.
+  -v, --print-verify BOOLEAN
   --log-level [debug|info|warning|error|critical]
-  --help                          Show this message and exit.
+                                  Log level.  [default: INFO]
+  -h, --help                      Show this message and exit.
 ```
 
 ## Test Status

@@ -54,7 +54,7 @@ class Solver:
             self.cleanup()
 
         if self.board.check_hidden_double():
-            # self.board.check_naked_double()
+            self.board.check_naked_double()
             self.cleanup()
 
         if self.board.check_locked_candidate():

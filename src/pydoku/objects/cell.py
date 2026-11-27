@@ -87,8 +87,10 @@ class Cell:
             return f"{base}, solved={self.solved}, solution={self.solution}, initial={self.initial})"
         elif self.solved:
             return f"{base}, solved={self.solved}, solution={self.solution})"
-        elif self.bival:
-            return f"{base}, strong_links={self.strong_links}, bival={self.bival})"
+        elif self.bival and self.strong_links:
+            return f"{base}, strong_links={', '.join([c.pos for c in self.strong_links]) if self.strong_links else []}, bival={self.bival})"
+        elif self.bival and not self.strong_links:
+            return f"{base}, bival={self.bival})"
         else:
             return f"{base})"
 

@@ -56,7 +56,7 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
     default=LogLevel.INFO,
     type=click.Choice(LogLevel, case_sensitive=False),
     show_default=True,
-    help="",
+    help="Log level.",
 )
 def solve(
     level: Level, puzzle: int, rounds: int, log_level: str, print_verify: bool
