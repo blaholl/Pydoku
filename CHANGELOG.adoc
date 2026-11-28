@@ -9,6 +9,9 @@
 * Added `Pydoku` logo.
 * Added input functionality to more efficiently add new puzzles.
 
+=== Changed
+* Changed log level flagging in `solve()` command options.
+
 === Updated
 * Updated README.
 

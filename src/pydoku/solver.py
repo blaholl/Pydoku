@@ -1,5 +1,8 @@
+import logging
 from pathlib import Path
 from typing import TYPE_CHECKING
+
+from .utils.logger import set_log
 
 if TYPE_CHECKING:
     from .commands.solve.solve import Level
@@ -32,16 +35,25 @@ class Solver:
         solved: bool = False
         round: int = 1
         while solved is False or round <= rounds:
+            set_log(msg=f"Round {round}/{rounds}", level=logging.INFO, fn="solve")
             if self.board.verify():
                 solved = True
+                set_log(msg="Puzzle solved", level=logging.INFO, fn="solve")
                 break
 
+            set_log(msg="Executing puzzle solver", level=logging.INFO, fn="solve")
             res = self.run()
             if res is True:
                 solved = True
+                set_log(msg="Puzzle solved", level=logging.INFO, fn="solve")
                 break
 
             if round >= rounds:
+                set_log(
+                    msg=f"Max rounds ({rounds}) exceeded",
+                    level=logging.INFO,
+                    fn="solve",
+                )
                 break
             round += 1
 

@@ -51,21 +51,27 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
     show_default=True,
 )
 @click.option(
-    "-v",
-    "--print-verify",
+    "--verify",
     is_flag=True,
     default=False,
     help="Flag to display container-level verification at end of run.",
 )
 @click.option(
-    "--log-level",
-    default=LogLevel.INFO,
-    type=click.Choice(LogLevel, case_sensitive=False),
-    show_default=True,
-    help="Log level.",
+    "-v",
+    "--verbose",
+    is_flag=True,
+    default=False,
+    help="Flag to log level to INFO.",
+)
+@click.option(
+    "-d",
+    "--debug",
+    is_flag=True,
+    default=False,
+    help="Flag to log level to DEBUG",
 )
 def solve(
-    level: Level, puzzle: int, rounds: int, log_level: str, print_verify: bool
+    level: Level, puzzle: int, rounds: int, verbose: bool, debug: bool, verify: bool
 ) -> list[list[int]]:
     """
 
@@ -74,9 +80,15 @@ def solve(
     |_____]   \_/   |     \ |     | |____/  |     |
     |          |    |_____/ |_____| |    \_ |_____|
     """  # noqa: W605
+    log_level = LogLevel.WARNING
+    if verbose:
+        log_level = LogLevel.INFO
+    if debug:
+        log_level = LogLevel.DEBUG
+
     logger.setLevel(log_level.upper())
     solver: Solver = Solver.open(PUZZLES, level, puzzle)
     board = solver.board
     solver.solve(rounds)
 
-    board.show(print_verify=print_verify)
+    board.show(print_verify=verify)

@@ -255,10 +255,11 @@ class Board:
 
     def cleanup(func: Callable[...]) -> None:
         def wrapper(self) -> Callable[[None], bool]:
+            set_log(msg=f"Entering {func.__name__}", level=logging.DEBUG, fn="cleanup")
             res: bool = func(self)
+            set_log(msg=f"Exiting {func.__name__}", level=logging.DEBUG, fn="cleanup")
             if res is True:
                 self._get_all_bival_cells()
-                set_log(msg=f"print me -> {res}", fn="cleanup")
             return res
 
         return wrapper
@@ -286,6 +287,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_naked_double(self) -> bool:
         result: bool = False
 

@@ -25,10 +25,10 @@ Options:
                                   level's top-level key.
   -r, --rounds INTEGER            Number of rounds to run the parser.
                                   [default: 3]
-  -v, --print-verify              Flag to display container-level verification
+  --verify                        Flag to display container-level verification
                                   at end of run.
-  --log-level [debug|info|warning|error|critical]
-                                  Log level.  [default: INFO]
+  -v, --verbose                   Flag to log level to INFO.
+  -d, --debug                     Flag to log level to DEBUG.
   -h, --help                      Show this message and exit.
 ```
 
@@ -64,7 +64,7 @@ Current results:
 
 ## Implemented Techniques
 
-| 10 / 45 (202.22%) |
+| 10 / 45 (22.22%) |
 |-|
 
 <details>
