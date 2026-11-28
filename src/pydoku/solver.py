@@ -24,12 +24,14 @@ class Solver:
 
         return cls(board)
 
-    def cleanup(self) -> None:
+    def cleanup(self) -> bool:
         if self.board.check_naked_single():
             self.cleanup()
 
         if self.board.check_hidden_single():
             self.cleanup()
+
+        return self.board.verify()
 
     def solve(self, rounds: int = 3) -> None:
         solved: bool = False
@@ -48,6 +50,13 @@ class Solver:
                 set_log(msg="Puzzle solved", level=logging.INFO, fn="solve")
                 break
 
+            set_log(msg="Executing mid game techniques", level=logging.INFO, fn="solve")
+            res = self.mid_1()
+            if res is True:
+                solved = True
+                set_log(msg="Puzzle solved", level=logging.INFO, fn="solve")
+                break
+
             if round >= rounds:
                 set_log(
                     msg=f"Max rounds ({rounds}) exceeded",
@@ -60,41 +69,69 @@ class Solver:
         return self.board.verify()
 
     def run(self) -> None:
-        self.cleanup()
+        if self.cleanup():
+            return True
 
         if self.board.check_naked_double():
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_hidden_double():
             self.board.check_naked_double()
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_locked_candidate():
             self.board.check_hidden_double()
             self.board.check_naked_double()
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_pointing_tuple():
             self.board.check_hidden_double()
             self.board.check_naked_double()
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_naked_triple():
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_hidden_triple():
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_x_wing():
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
         if self.board.check_y_wing():
-            self.cleanup()
+            if self.cleanup():
+                return True
+            else:
+                pass
 
-        if self.board.verify():
-            return True
+        return False
 
     def mid_1(self) -> bool:
-        techniques = [self.board.check_hidden_triple()]
+        if self.board.check_hidden_triple():
+            if self.cleanup():
+                return True
+            else:
+                pass
 
-        return any(techniques)
+        return False
