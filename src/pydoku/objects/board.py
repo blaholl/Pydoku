@@ -1,6 +1,6 @@
 import itertools as it
 import logging
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from functools import singledispatchmethod
 from pathlib import Path
 from types import NoneType
@@ -253,6 +253,16 @@ class Board:
 
         display_board(self)
 
+    def cleanup(func: Callable[...]) -> None:
+        def wrapper(self) -> Callable[[None], bool]:
+            res: bool = func(self)
+            if res is True:
+                self._get_all_bival_cells()
+                set_log(msg=f"print me -> {res}", fn="cleanup")
+            return res
+
+        return wrapper
+
     def check_naked_single(self) -> bool:
         result: bool = False
 
@@ -264,6 +274,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_hidden_single(self) -> bool:
         result: bool = False
         for container in self.open:
@@ -294,12 +305,13 @@ class Board:
 
         return result
 
+    @cleanup
     def check_hidden_double(self) -> bool:
         result: bool = False
 
         for container in self.open:
-            # if len(container.open) < 4:
-            #     continue
+            if len(container.open) < 4:
+                continue
             for hd in HiddenDouble(container):
                 hd: Excluded
                 self.evaluate_result(hd)
@@ -313,6 +325,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_naked_triple(self) -> bool:
         result: bool = False
 
@@ -332,6 +345,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_hidden_triple(self) -> bool:
         result: bool = False
 
@@ -351,6 +365,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_pointing_tuple(self) -> bool:
         result: bool = False
 
@@ -390,6 +405,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_locked_candidate(self) -> bool:
         result: bool = False
 
@@ -407,6 +423,7 @@ class Board:
 
         return result
 
+    @cleanup
     def check_x_wing(self) -> bool:
         result = False
         self._get_all_bival_cells()
@@ -440,7 +457,6 @@ class Board:
 
     def check_y_wing(self) -> bool:
         result = False
-        self._get_all_bival_cells()
 
         for yw in YWing(
             self.rows.open, self.columns.open, self.houses.open, self.bivals

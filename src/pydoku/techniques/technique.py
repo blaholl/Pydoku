@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from collections.abc import Callable, Generator
+from collections.abc import Callable, Generator, Iterable
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -16,7 +16,7 @@ class Technique(ABC):
         __next__(): Standard iterator implementation.
     """
 
-    def __init__(self, sequence) -> None:
+    def __init__(self, sequence: Iterable) -> None:
         self._sequence = sequence
         self._index = 0
 

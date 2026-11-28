@@ -1,7 +1,7 @@
 import click
 
 from ..__version__ import __version__
-from ..commands import solve
+from ..commands import add, solve
 
 
 @click.group(name="Pydoku")
@@ -17,3 +17,4 @@ def cli() -> None:
 
 
 cli.add_command(solve)
+cli.add_command(add)

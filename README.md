@@ -30,6 +30,20 @@ Options:
   -h, --help                      Show this message and exit.
 ```
 
+### Add
+```python
+Usage: pydoku add [OPTIONS] [FILEPATH]
+
+Positional arguments:
+  [FILEPATH]  Path of the file to import.
+
+Options:
+  -l, --level TEXT  Top-level key to which to add the puzzle. Should be
+                    snake_case.
+  -n, --new TEXT    Creates a new top-level key. Should be snake_case.
+  -h, --help        Show this message and exit.
+```
+
 ## Test Status
 Testing is based on running the application against puzzles taken from the `Good Sudoku` app.  In the `Good` section of the app, every tenth puzzle is a more difficult "skull" puzzle that still only uses the techniques appropriate to that puzzle's level.
 
@@ -70,7 +84,10 @@ Current results:
 ### Application
 * [ ] Build remainder of techniques
 * [ ] Logging
+  * [ ] Add logging to already-built commands
 * [ ] CLI Options
+  * [ ] Add tests for `Add` command
+  * [ ] Add `All` command.
 * [ ] Add remaining Impossible 1 puzzles
 * [ ] Add Impossible 2 puzzles
 
@@ -103,7 +120,7 @@ Current results:
   * [ ] Skyscraper
   * [ ] 2-String Kite
   * [ ] Empty Rectangle
-  * [ ] Color Chain
+  * [ ] Color Chain - Remote Pairs?
   * [ ] Finned X-Wing
   * [ ] Finned Swordfish
   * [ ] Finned Jellyfish

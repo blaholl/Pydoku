@@ -12,3 +12,4 @@ py-coverage
 pytest.ini
 
 *cache.py
+test-puzzles_copy.json

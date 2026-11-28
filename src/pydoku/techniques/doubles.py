@@ -1,12 +1,10 @@
 import itertools as it
 from collections import Counter
 from collections.abc import Generator
-from functools import cache
 from typing import TYPE_CHECKING
 
 import more_itertools as mi
 
-# from ..utils.policies import Policy
 from ..utils import set_excluded, set_log
 from ..utils.result import Excluded, NoOp, Result
 from .technique import Technique
@@ -16,7 +14,6 @@ if TYPE_CHECKING:
     from ..objects.containers import Container
 
 
-@cache
 class NakedDouble(Technique):
     """Callable object to find Naked Doubles in a :class:`Container`.
 
@@ -62,7 +59,6 @@ class NakedDouble(Technique):
             yield Excluded(exclusion_cells, to_exclude)
 
 
-# @cache
 class HiddenDouble(Technique):
     def __init__(self, container: Container) -> None:
         super().__init__(container)
@@ -92,7 +88,7 @@ class HiddenDouble(Technique):
             )
 
             set_log(
-                msg=f"{self.container.__class__.__name__} {self.container.idx} | {set_excluded(to_exclude)}",
+                msg=f"{self.container.__class__.__name__} {self.container.idx} | {set_excluded(combi)}",
                 fn="hidden_double",
             )
 
