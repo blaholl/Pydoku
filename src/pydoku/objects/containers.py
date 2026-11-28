@@ -374,3 +374,19 @@ class Number:
             for sl in con.strong_links:
                 if self.value == sl.link:
                     self._strong_links.append(sl)
+
+
+@dataclass
+class ContainerStats:
+    solutions: int
+    open: Counter
+    known: list[int]
+    unknown: list[int]
+
+
+@dataclass
+class Stats:
+    solutions: dict[int, int]
+    rows: dict[int, ContainerStats] = field(default_factory=dict)
+    cols: dict[int, ContainerStats] = field(default_factory=dict)
+    houses: dict[int, ContainerStats] = field(default_factory=dict)

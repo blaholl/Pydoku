@@ -8,6 +8,7 @@
 * Added TextEffects to certain successful output strings.
 * Added `Pydoku` logo.
 * Added input functionality to more efficiently add new puzzles.
+* Added functions for gather cell and container stats.
 
 === Changed
 * Changed log level flagging in `solve()` command options.

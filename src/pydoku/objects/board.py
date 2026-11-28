@@ -18,12 +18,14 @@ from .containers import (
     Column,
     Columns,
     Container,
+    ContainerStats,
     House,
     Houses,
     PhistomefelRing,
     Row,
     Rows,
     Sightline,
+    Stats,
 )
 
 type Puzzle = list[int]
@@ -83,6 +85,8 @@ class Board:
             self.rows.open + self.columns.open + self.houses.open
         )
 
+        self._stats: Stats = self._gather_stats()
+
         self._phistomefel_ring: PhistomefelRing = None
         self._bivals: set[Cell] = set()
         self._get_all_bival_cells()
@@ -104,6 +108,10 @@ class Board:
         return sorted(
             self._get_all_bival_cells(), key=lambda c: (c.row, c.col, c.house)
         )
+
+    @property
+    def stats(self) -> Stats:
+        return self._gather_stats()
 
     def set_puzzle(self, puzzle_path: str, level: str, num: int) -> None:
         puzzle: Puzzle = load_puzzle(Path(puzzle_path), level=level, puzzle=num)
@@ -211,8 +219,27 @@ class Board:
 
         return self._bivals
 
-    def gather_stats(self) -> None:
-        pass
+    def _set_container_stats(self, container: Container) -> ContainerStats:
+        return ContainerStats(
+            solutions=len([c for c in container if c.solved]),
+            open=container.get_counts(),
+            known=container.known,
+            unknown=container.unknown,
+        )
+
+    def _gather_stats(self) -> Stats:
+        set_log(msg="Collecting stats", level=logging.INFO, fn="gather_stats")
+        solutions = {i: 0 for i in range(1, 10)}
+        rows, cols, houses = {}, {}, {}
+        for cell in self.index.values():
+            if cell.solved:
+                solutions[cell.solution] += 1
+
+        rows = {row.idx: self._set_container_stats(row) for row in self.rows}
+        cols = {col.idx: self._set_container_stats(col) for col in self.columns}
+        houses = {house.idx: self._set_container_stats(house) for house in self.houses}
+
+        return Stats(solutions=solutions, rows=rows, cols=cols, houses=houses)
 
     @singledispatchmethod
     def evaluate_result(self, _: NoOp) -> None:
@@ -257,9 +284,12 @@ class Board:
         def wrapper(self) -> Callable[[None], bool]:
             set_log(msg=f"Entering {func.__name__}", level=logging.DEBUG, fn="cleanup")
             res: bool = func(self)
-            set_log(msg=f"Exiting {func.__name__}", level=logging.DEBUG, fn="cleanup")
+
             if res is True:
                 self._get_all_bival_cells()
+                self._gather_stats()
+                set_log(msg=f"Stats: {self.stats}", level=logging.DEBUG, fn="cleanup")
+            set_log(msg=f"Exiting {func.__name__}", level=logging.DEBUG, fn="cleanup")
             return res
 
         return wrapper
@@ -271,6 +301,11 @@ class Board:
             for ns in NakedSingle(container):
                 self.evaluate_result(ns)
                 if not isinstance(ns, NoOp):
+                    set_log(
+                        msg=f"Set {ns.cell.solution} in:{set_cells([ns.cell])}",
+                        level=logging.DEBUG,
+                        fn="check_hidden_single",
+                    )
                     result = True
 
         return result
@@ -283,6 +318,11 @@ class Board:
                 hs: Solved
                 self.evaluate_result(hs)
                 if not isinstance(hs, NoOp):
+                    set_log(
+                        msg=f"Set {hs.cell.solution} in:{set_cells([hs.cell])}",
+                        level=logging.DEBUG,
+                        fn="check_hidden_single",
+                    )
                     result = True
 
         return result

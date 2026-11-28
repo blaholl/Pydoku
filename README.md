@@ -89,7 +89,8 @@ Current results:
   * [ ] Add logging to already-built commands
 * [ ] CLI Options
   * [ ] Add tests for `Add` command
-  * [ ] Add `All` command.
+  * [ ] Add `All` command
+* [ ] Add option to Board techniques to process individual containers and full sightlines
 * [ ] Add remaining Impossible 1 puzzles
 * [ ] Add Impossible 2 puzzles
 

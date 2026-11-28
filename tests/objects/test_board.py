@@ -3,7 +3,14 @@ from pathlib import Path
 import pytest
 
 from pydoku.objects import Board, Cell, Column, House, Row
-from pydoku.objects.containers import Columns, Houses, Rows, Sightline
+from pydoku.objects.containers import (
+    Columns,
+    ContainerStats,
+    Houses,
+    Rows,
+    Sightline,
+    Stats,
+)
 
 
 @pytest.fixture
@@ -197,3 +204,19 @@ def test_bival_cells(get_board_from_file: Board) -> None:
     board.populate()
 
     assert all(len(c.can) == 2 and c.bival is True for c in board.bivals)
+
+
+def test_get_board_stats(get_board_from_file: Board) -> None:
+    board: Board = get_board_from_file
+
+    board.populate()
+
+    test_stats = {1: 2, 2: 7, 3: 3, 4: 4, 5: 4, 6: 5, 7: 3, 8: 3, 9: 4}
+
+    stats = board.stats
+
+    assert isinstance(stats, Stats)
+    assert stats.solutions == test_stats
+    assert isinstance(stats.rows[4], ContainerStats)
+    assert isinstance(stats.cols[3], ContainerStats)
+    assert isinstance(stats.houses[8], ContainerStats)
