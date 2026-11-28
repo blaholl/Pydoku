@@ -24,7 +24,9 @@ Options:
   -p, --puzzle INTEGER            Number of the puzzle to retrieve under each
                                   level's top-level key.
   -r, --rounds INTEGER            Number of rounds to run the parser.
-  -v, --print-verify BOOLEAN
+                                  [default: 3]
+  -v, --print-verify              Flag to display container-level verification
+                                  at end of run.
   --log-level [debug|info|warning|error|critical]
                                   Log level.  [default: INFO]
   -h, --help                      Show this message and exit.

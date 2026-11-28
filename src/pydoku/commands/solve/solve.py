@@ -50,7 +50,13 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
     help="Number of rounds to run the parser.",
     show_default=True,
 )
-@click.option("-v", "--print-verify", type=click.BOOL, default=True)
+@click.option(
+    "-v",
+    "--print-verify",
+    is_flag=True,
+    default=False,
+    help="Flag to display container-level verification at end of run.",
+)
 @click.option(
     "--log-level",
     default=LogLevel.INFO,

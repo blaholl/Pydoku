@@ -31,6 +31,13 @@ CONTEXT_SETTINGS = {"help_option_names": ["-h", "--help"]}
     help="Creates a new top-level key. Should be snake_case.",
 )
 def add(filepath: str, level: str, new: str) -> None:
+    """
+
+    \b
+     _____  __   __ ______   _____  _     _ _     _
+    |_____]   \_/   |     \ |     | |____/  |     |
+    |          |    |_____/ |_____| |    \_ |_____|
+    """  # noqa: W605
     while True:
         set_input_and_file(filepath, level, new)
 
